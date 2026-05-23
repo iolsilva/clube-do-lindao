@@ -80,10 +80,12 @@ alter table public.customers
 
 drop trigger if exists set_customers_code on public.customers;
 create trigger set_customers_code
-before insert or update of name, code_number on public.customers
+before insert or update on public.customers
 for each row execute function public.set_customer_code();
 
-create or replace view public.customer_points_view
+drop view if exists public.customer_points_view;
+
+create view public.customer_points_view
 with (security_invoker = true) as
 with purchase_totals as (
   select

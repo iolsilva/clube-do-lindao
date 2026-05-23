@@ -185,7 +185,7 @@ for each row execute function public.set_updated_at();
 
 drop trigger if exists set_customers_code on public.customers;
 create trigger set_customers_code
-before insert or update of name, code_number on public.customers
+before insert or update on public.customers
 for each row execute function public.set_customer_code();
 
 drop trigger if exists set_purchases_updated_at on public.purchases;
@@ -221,7 +221,9 @@ $$;
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to authenticated;
 
-create or replace view public.customer_points_view
+drop view if exists public.customer_points_view;
+
+create view public.customer_points_view
 with (security_invoker = true) as
 with purchase_totals as (
   select

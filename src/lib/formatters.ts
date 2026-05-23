@@ -32,3 +32,63 @@ export function formatPhone(phone: string) {
 
   return phone;
 }
+
+export function parseCurrencyToCents(value: string) {
+  const cleaned = value.replace(/[^\d,.]/g, "").trim();
+
+  if (!cleaned) {
+    return null;
+  }
+
+  let normalized = cleaned;
+
+  if (cleaned.includes(",")) {
+    normalized = cleaned.replace(/\./g, "").replace(",", ".");
+  } else if (cleaned.includes(".")) {
+    const parts = cleaned.split(".");
+    const lastPart = parts.at(-1) ?? "";
+
+    normalized =
+      parts.length > 1 && lastPart.length === 3
+        ? parts.join("")
+        : cleaned.replace(/(?<=\d)\.(?=\d{3}\b)/g, "");
+  }
+
+  const amount = Number(normalized);
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return null;
+  }
+
+  return Math.round(amount * 100);
+}
+
+export function formatCurrencyFromCents(cents: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    currency: "BRL",
+    style: "currency",
+  }).format(cents / 100);
+}
+
+export function calculatePointsFromCents(cents: number) {
+  return cents / 1000;
+}
+
+export function formatPoints(points: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  }).format(points);
+}
+
+export function formatDateTime(value: string | Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+export function toDateTimeLocalValue(date = new Date()) {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return localDate.toISOString().slice(0, 16);
+}
