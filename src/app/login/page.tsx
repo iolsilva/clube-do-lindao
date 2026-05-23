@@ -1,3 +1,4 @@
+import { LoginForm } from "@/components/auth/login-form";
 import { PublicShell } from "@/components/layout/public-shell";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
@@ -8,18 +9,16 @@ export default function LoginPage() {
       <PageHeader
         eyebrow="Acesso administrativo"
         title="Login"
-        description="Base visual da tela de entrada da administração. A autenticação será conectada em uma próxima etapa."
+        description="Entre com uma conta autorizada no Supabase Auth para acessar a administração."
       />
       <Card className="max-w-md">
         <CardHeader>
           <h2 className="text-lg font-bold text-lindao-navy">
-            Área protegida
+            Area protegida
           </h2>
         </CardHeader>
         <CardContent>
-          <p className="text-sm leading-6 text-slate-600">
-            Formulário de login reservado para a implementação de autenticação.
-          </p>
+          <LoginForm />
         </CardContent>
       </Card>
     </PublicShell>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { Brand } from "@/components/layout/brand";
 import { adminNavigation } from "@/lib/navigation";
 
@@ -30,12 +31,7 @@ export function AdminShell({ children }: AdminShellProps) {
               <p className="text-sm font-semibold uppercase tracking-wide text-lindao-blue">
                 Administração
               </p>
-              <Link
-                href="/login"
-                className="rounded-md border border-lindao-line px-3 py-2 text-sm font-semibold text-lindao-navy transition-colors hover:border-lindao-gold hover:bg-lindao-gold-soft"
-              >
-                Login
-              </Link>
+              <LogoutButton />
             </div>
           </header>
           <main className="flex w-full flex-1 flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
