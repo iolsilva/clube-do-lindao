@@ -1,5 +1,7 @@
 create extension if not exists pgcrypto;
 
+create sequence if not exists public.customer_code_number_seq;
+
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null,
@@ -22,6 +24,8 @@ create table if not exists public.levels (
 
 create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
+  code_number integer,
+  code text,
   name text not null,
   document_type text not null default 'cpf' check (document_type in ('cpf', 'cnpj')),
   document text not null unique,
@@ -32,6 +36,12 @@ create table if not exists public.customers (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.customers
+  add column if not exists code_number integer;
+
+alter table public.customers
+  add column if not exists code text;
 
 create table if not exists public.purchases (
   id uuid primary key default gen_random_uuid(),
@@ -70,6 +80,10 @@ create table if not exists public.reward_redemptions (
 );
 
 create index if not exists customers_level_id_idx on public.customers(level_id);
+create unique index if not exists customers_code_number_key
+  on public.customers(code_number);
+create unique index if not exists customers_code_key
+  on public.customers(code);
 create index if not exists purchases_customer_id_idx on public.purchases(customer_id);
 create index if not exists purchases_purchased_at_idx on public.purchases(purchased_at);
 create index if not exists rewards_active_idx on public.rewards(active);
@@ -88,6 +102,72 @@ begin
 end;
 $$;
 
+create or replace function public.format_customer_code(
+  customer_name text,
+  customer_number integer
+)
+returns text
+language sql
+stable
+as $$
+  select concat(
+    coalesce(nullif(split_part(btrim(customer_name), ' ', 1), ''), 'Cliente'),
+    ' - #',
+    lpad(customer_number::text, 3, '0')
+  );
+$$;
+
+create or replace function public.set_customer_code()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.code_number is null then
+    new.code_number = nextval('public.customer_code_number_seq');
+  end if;
+
+  if tg_op = 'INSERT' then
+    new.code = public.format_customer_code(new.name, new.code_number);
+  elsif new.name is distinct from old.name
+    or new.code_number is distinct from old.code_number
+    or new.code is null
+  then
+    new.code = public.format_customer_code(new.name, new.code_number);
+  end if;
+
+  return new;
+end;
+$$;
+
+with numbered_customers as (
+  select
+    id,
+    row_number() over (order by created_at, id) as generated_number
+  from public.customers
+  where code_number is null
+)
+update public.customers
+set code_number = numbered_customers.generated_number
+from numbered_customers
+where customers.id = numbered_customers.id;
+
+update public.customers
+set code = public.format_customer_code(name, code_number)
+where code is null
+  and code_number is not null;
+
+select setval(
+  'public.customer_code_number_seq',
+  greatest(coalesce((select max(code_number) from public.customers), 0), 1),
+  coalesce((select max(code_number) from public.customers), 0) > 0
+);
+
+alter table public.customers
+  alter column code_number set not null,
+  alter column code set not null;
+
 drop trigger if exists set_profiles_updated_at on public.profiles;
 create trigger set_profiles_updated_at
 before update on public.profiles
@@ -102,6 +182,11 @@ drop trigger if exists set_customers_updated_at on public.customers;
 create trigger set_customers_updated_at
 before update on public.customers
 for each row execute function public.set_updated_at();
+
+drop trigger if exists set_customers_code on public.customers;
+create trigger set_customers_code
+before insert or update of name, code_number on public.customers
+for each row execute function public.set_customer_code();
 
 drop trigger if exists set_purchases_updated_at on public.purchases;
 create trigger set_purchases_updated_at
@@ -156,6 +241,7 @@ redemption_totals as (
 )
 select
   customers.id as customer_id,
+  customers.code as customer_code,
   customers.name as customer_name,
   customers.document_type,
   customers.document,
@@ -285,6 +371,8 @@ grant all on table public.purchases to authenticated;
 grant all on table public.rewards to authenticated;
 grant all on table public.reward_redemptions to authenticated;
 grant select on table public.customer_points_view to authenticated;
+grant usage, select, update on sequence public.customer_code_number_seq
+  to authenticated;
 
 grant select on table public.rewards to anon;
 grant select on table public.public_ranking_view to anon, authenticated;
