@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f8fc;
+  --foreground: #102033;
+  --app-font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-lindao-navy: #0c2448;
+  --color-lindao-blue: #1555a0;
+  --color-lindao-blue-soft: #e8f1ff;
+  --color-lindao-gold: #d6a62c;
+  --color-lindao-gold-soft: #fff4cf;
+  --color-lindao-line: #d9e2ef;
+  --font-sans: var(--app-font-sans);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--app-font-sans);
+}
+
+a {
+  text-underline-offset: 4px;
+}
