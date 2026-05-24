@@ -23,7 +23,7 @@ function getPositionLabel(position: number) {
 
 function getTopCardClass(position: number) {
   if (position === 1) {
-    return "border-lindao-gold/70 bg-[radial-gradient(circle_at_80%_0%,rgba(245,197,24,0.18),transparent_12rem),linear-gradient(145deg,rgba(245,197,24,0.18),rgba(10,23,64,0.96))]";
+    return "border-lindao-gold/80 bg-[radial-gradient(circle_at_80%_0%,rgba(245,197,24,0.24),transparent_12rem),linear-gradient(145deg,rgba(245,197,24,0.2),rgba(10,23,64,0.96))] shadow-[0_26px_84px_rgba(245,197,24,0.12)]";
   }
 
   if (position === 2) {
@@ -31,6 +31,22 @@ function getTopCardClass(position: number) {
   }
 
   return "border-lindao-blue/55 bg-[radial-gradient(circle_at_80%_0%,rgba(37,99,235,0.18),transparent_12rem),linear-gradient(145deg,rgba(37,99,235,0.2),rgba(10,23,64,0.96))]";
+}
+
+function getPositionBadgeClass(position: number) {
+  if (position === 1) {
+    return "border-lindao-gold/55 bg-lindao-gold/20 text-lindao-gold";
+  }
+
+  if (position === 2) {
+    return "border-slate-300/35 bg-slate-300/10 text-slate-100";
+  }
+
+  if (position === 3) {
+    return "border-lindao-blue/45 bg-lindao-blue/20 text-white";
+  }
+
+  return "border-white/10 bg-white/5 text-slate-200";
 }
 
 export default async function RankingPage() {
@@ -45,7 +61,6 @@ export default async function RankingPage() {
 
   const ranking = (data ?? []) as RankingRow[];
   const topRanking = ranking.filter((row) => row.position <= 3);
-  const remainingRanking = ranking.filter((row) => row.position > 3);
 
   return (
     <PublicShell>
@@ -83,7 +98,7 @@ export default async function RankingPage() {
       ) : ranking.length === 0 ? (
         <EmptyState
           eyebrow="Sem pontuação"
-          title="Ranking ainda sem clientes"
+          title="Nenhum participante no ranking ainda."
           description="Os clientes aparecem aqui quando acumularem pontos."
         />
       ) : (
@@ -96,12 +111,25 @@ export default async function RankingPage() {
                   className={cn(
                     "overflow-hidden border",
                     getTopCardClass(customer.position),
+                    customer.position === 1 ? "md:-translate-y-2" : null,
                   )}
                 >
-                  <CardContent className="grid min-h-48 content-between gap-5 p-5">
+                  <CardContent
+                    className={cn(
+                      "grid content-between gap-5 p-5",
+                      customer.position === 1 ? "min-h-56" : "min-h-48",
+                    )}
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="flex size-10 items-center justify-center rounded-md border border-lindao-gold/35 bg-lindao-gold/15 text-lg font-black text-lindao-gold">
+                        <span
+                          className={cn(
+                            "flex items-center justify-center rounded-md border border-lindao-gold/35 bg-lindao-gold/15 font-black text-lindao-gold",
+                            customer.position === 1
+                              ? "size-12 text-xl"
+                              : "size-10 text-lg",
+                          )}
+                        >
                           {customer.position}
                         </span>
                         <div>
@@ -122,7 +150,12 @@ export default async function RankingPage() {
 
                     <div className="space-y-3">
                       <div>
-                        <h2 className="line-clamp-2 text-xl font-black text-white">
+                        <h2
+                          className={cn(
+                            "line-clamp-2 font-black text-white",
+                            customer.position === 1 ? "text-2xl" : "text-xl",
+                          )}
+                        >
                           {customer.customer_name}
                         </h2>
                         <p className="mt-1 text-sm font-semibold text-slate-300">
@@ -145,67 +178,139 @@ export default async function RankingPage() {
             </section>
           ) : null}
 
-          {remainingRanking.length > 0 ? (
-            <Card className="overflow-hidden">
-              <CardHeader className="p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-lindao-gold">
-                      Classificação
-                    </p>
-                    <h2 className="mt-1 text-lg font-black text-white">
-                      Ranking geral
-                    </h2>
-                  </div>
-                  <Sparkles
-                    aria-hidden="true"
-                    className="size-5 text-lindao-gold"
-                    strokeWidth={2.4}
-                  />
+          <Card className="overflow-hidden">
+            <CardHeader className="p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-lindao-gold">
+                    Classificação
+                  </p>
+                  <h2 className="mt-1 text-lg font-black text-white">
+                    Ranking completo
+                  </h2>
                 </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-white/10">
-                  {remainingRanking.map((customer) => (
-                    <div
-                      key={customer.customer_id}
-                      className="grid gap-3 px-4 py-3 transition duration-200 hover:bg-white/[0.045] sm:grid-cols-[64px_1fr_auto] sm:items-center"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="flex size-10 items-center justify-center rounded-md border border-lindao-blue/45 bg-lindao-blue/20 text-sm font-black text-white">
-                          {customer.position}
-                        </span>
-                        <span className="text-xs font-black uppercase tracking-wide text-slate-400 sm:hidden">
-                          {getPositionLabel(customer.position)}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="truncate text-base font-black text-white">
-                          {customer.customer_name}
-                        </h3>
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs font-black uppercase tracking-wide">
-                          <span className="rounded-full border border-lindao-gold/30 bg-lindao-gold/10 px-3 py-1 text-lindao-gold">
+                <Sparkles
+                  aria-hidden="true"
+                  className="size-5 text-lindao-gold"
+                  strokeWidth={2.4}
+                />
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full min-w-[760px] border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-white/10 bg-white/[0.035] text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                      <th className="px-4 py-3 text-lindao-gold">
+                        Colocação
+                      </th>
+                      <th className="px-4 py-3">Integrante</th>
+                      <th className="px-4 py-3">Código</th>
+                      <th className="px-4 py-3">Nível</th>
+                      <th className="px-4 py-3 text-right text-lindao-gold">
+                        Pontos
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {ranking.map((customer) => (
+                      <tr
+                        key={customer.customer_id}
+                        className="transition duration-200 hover:bg-white/[0.045]"
+                      >
+                        <td className="px-4 py-3">
+                          <div
+                            className={cn(
+                              "inline-flex h-9 min-w-12 items-center justify-center gap-1 rounded-md border px-2 text-sm font-black",
+                              getPositionBadgeClass(customer.position),
+                            )}
+                          >
+                            {customer.position <= 3 ? (
+                              <Trophy
+                                aria-hidden="true"
+                                className="size-3.5"
+                                strokeWidth={2.5}
+                              />
+                            ) : null}
+                            {customer.position}º
+                          </div>
+                        </td>
+                        <td className="max-w-[260px] px-4 py-3">
+                          <p className="truncate text-sm font-black text-white">
+                            {customer.customer_name}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex rounded-full border border-lindao-gold/25 bg-lindao-gold/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-lindao-gold">
                             {customer.customer_code ?? "Sem código"}
                           </span>
-                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+                        </td>
+                        <td className="max-w-[180px] px-4 py-3">
+                          <p className="truncate text-sm font-semibold text-slate-300">
                             {customer.level_name ?? "Sem nível"}
-                          </span>
-                        </div>
+                          </p>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <p className="text-lg font-black text-lindao-gold">
+                            {formatPoints(Number(customer.total_points))}
+                          </p>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="divide-y divide-white/10 md:hidden">
+                {ranking.map((customer) => (
+                  <div
+                    key={customer.customer_id}
+                    className="grid gap-3 px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div
+                        className={cn(
+                          "inline-flex h-9 min-w-12 items-center justify-center gap-1 rounded-md border px-2 text-sm font-black",
+                          getPositionBadgeClass(customer.position),
+                        )}
+                      >
+                        {customer.position <= 3 ? (
+                          <Trophy
+                            aria-hidden="true"
+                            className="size-3.5"
+                            strokeWidth={2.5}
+                          />
+                        ) : null}
+                        {customer.position}º
                       </div>
-                      <div className="text-left sm:text-right">
+                      <div className="text-right">
                         <p className="text-2xl font-black text-lindao-gold">
                           {formatPoints(Number(customer.total_points))}
                         </p>
-                        <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+                        <p className="text-[10px] font-black uppercase tracking-wide text-slate-400">
                           pontos
                         </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ) : null}
+
+                    <div>
+                      <h3 className="line-clamp-2 text-base font-black text-white">
+                        {customer.customer_name}
+                      </h3>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs font-black uppercase tracking-wide">
+                        <span className="rounded-full border border-lindao-gold/30 bg-lindao-gold/10 px-3 py-1 text-lindao-gold">
+                          {customer.customer_code ?? "Sem código"}
+                        </span>
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+                          {customer.level_name ?? "Sem nível"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </>
       )}
     </PublicShell>
