@@ -253,7 +253,7 @@ export default async function AdminDashboardPage() {
         />
         <MetricCard
           icon={Banknote}
-          label="Total vendido"
+          label="Vendas"
           value={formatCurrencyFromCents(totalSalesCents)}
           detail="Valor total movimentado pelas compras registradas."
           tone="blue"

@@ -52,7 +52,7 @@ async function getHeaderMetrics(): Promise<HeaderMetric[]> {
     },
     {
       detail: "Valor total movimentado pelas compras registradas.",
-      label: "Total vendido",
+      label: "Vendas",
       value: formatCurrencyFromCents(totalSalesCents),
     },
   ];
