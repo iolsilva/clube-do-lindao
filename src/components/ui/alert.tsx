@@ -11,9 +11,9 @@ type AlertProps = {
 
 const variants: Record<AlertVariant, string> = {
   error: "border-red-200 bg-red-50 text-red-800",
-  info: "border-lindao-line bg-lindao-blue-soft text-lindao-navy",
+  info: "border-lindao-line bg-lindao-blue-soft text-white",
   success: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  warning: "border-lindao-gold/50 bg-lindao-gold-soft text-lindao-navy",
+  warning: "border-lindao-gold/50 bg-lindao-gold/15 text-lindao-gold",
 };
 
 export function Alert({
@@ -37,4 +37,3 @@ export function Alert({
     </div>
   );
 }
-

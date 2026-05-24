@@ -8,10 +8,9 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-md bg-slate-200/80 shadow-inner",
+        "animate-pulse rounded-md bg-white/15 shadow-inner",
         className,
       )}
     />
   );
 }
-

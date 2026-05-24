@@ -186,7 +186,7 @@ export default async function AdminComprasPage({
             {search || selectedCustomerId ? (
               <Link
                 href="/admin/compras"
-                className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold text-lindao-navy transition-colors hover:bg-lindao-blue-soft"
+                className="inline-flex h-10 items-center justify-center rounded-md border border-lindao-gold/30 px-4 text-sm font-semibold text-lindao-gold transition-colors hover:bg-lindao-gold/10"
               >
                 Limpar
               </Link>
@@ -202,8 +202,8 @@ export default async function AdminComprasPage({
                     className={cn(
                       "grid gap-4 rounded-md border p-4 md:grid-cols-[1fr_auto]",
                       selectedCustomerId === customer.id
-                        ? "border-lindao-blue bg-lindao-blue-soft"
-                        : "border-lindao-line bg-white",
+                        ? "border-lindao-gold/50 bg-lindao-gold/10"
+                        : "border-white/10 bg-white/5",
                     )}
                   >
                     <div className="space-y-2">
@@ -269,7 +269,7 @@ export default async function AdminComprasPage({
             {selectedCustomer ? (
               selectedCustomer.active ? (
                 <div className="grid gap-5">
-                  <div className="rounded-md border border-lindao-line bg-slate-50 p-4">
+                  <div className="rounded-md border border-white/10 bg-white/5 p-4">
                     <Badge>{selectedCustomer.code ?? "Sem codigo"}</Badge>
                     <h3 className="mt-3 text-lg font-bold text-lindao-navy">
                       {selectedCustomer.name}
@@ -317,11 +317,11 @@ export default async function AdminComprasPage({
             </div>
           </CardHeader>
           <CardContent className="grid gap-3 text-sm text-slate-600">
-            <div className="rounded-md bg-lindao-gold-soft p-4">
+            <div className="rounded-md border border-lindao-gold/25 bg-lindao-gold/10 p-4">
               <p className="font-bold text-lindao-navy">R$ 16,00</p>
               <p>gera 1,6 pontos</p>
             </div>
-            <div className="rounded-md bg-lindao-blue-soft p-4">
+            <div className="rounded-md border border-lindao-blue/30 bg-lindao-blue/15 p-4">
               <p className="font-bold text-lindao-navy">R$ 100,00</p>
               <p>gera 10 pontos</p>
             </div>

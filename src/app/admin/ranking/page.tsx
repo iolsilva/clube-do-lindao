@@ -197,7 +197,7 @@ export default async function AdminRankingPage({
             {search || status !== "all" ? (
               <Link
                 href="/admin/ranking"
-                className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold text-lindao-navy transition-colors hover:bg-lindao-blue-soft"
+                className="inline-flex h-10 items-center justify-center rounded-md border border-lindao-gold/30 px-4 text-sm font-semibold text-lindao-gold transition-colors hover:bg-lindao-gold/10"
               >
                 Limpar
               </Link>

@@ -11,7 +11,7 @@ export default function PremiosLoading() {
         title="Premios"
         description="Carregando premios ativos."
       />
-      <section className="rounded-lg border border-lindao-gold/45 bg-lindao-gold-soft p-6">
+      <section className="rounded-lg border border-lindao-gold/45 bg-lindao-gold/10 p-6">
         <Skeleton className="h-8 w-44" />
         <Skeleton className="mt-4 h-5 w-2/3" />
         <Skeleton className="mt-6 h-14 w-32" />
@@ -33,4 +33,3 @@ export default function PremiosLoading() {
     </PublicShell>
   );
 }
-

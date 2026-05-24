@@ -163,7 +163,7 @@ export default async function AdminClientesPage({
       </Card>
 
       <section className="grid gap-4">
-        <div className="rounded-lg border border-lindao-line bg-white p-4 shadow-sm">
+        <div className="rounded-lg border border-white/10 bg-white/5 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
           <form className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
             <label className="sr-only" htmlFor="customer-search">
               Buscar clientes
@@ -179,7 +179,7 @@ export default async function AdminClientesPage({
             {search ? (
               <Link
                 href="/admin/clientes"
-                className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-semibold text-lindao-navy transition-colors hover:bg-lindao-blue-soft"
+                className="inline-flex h-10 items-center justify-center rounded-md border border-lindao-gold/30 px-4 text-sm font-semibold text-lindao-gold transition-colors hover:bg-lindao-gold/10"
               >
                 Limpar
               </Link>

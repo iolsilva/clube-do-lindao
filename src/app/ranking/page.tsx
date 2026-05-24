@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/layout/public-shell";
+import Image from "next/image";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,14 +24,14 @@ function getPositionLabel(position: number) {
 
 function getTopCardClass(position: number) {
   if (position === 1) {
-    return "border-lindao-gold bg-lindao-gold-soft";
+    return "border-lindao-gold bg-[linear-gradient(145deg,rgba(245,197,24,0.22),rgba(10,23,64,0.96))]";
   }
 
   if (position === 2) {
-    return "border-slate-300 bg-slate-50";
+    return "border-slate-300/40 bg-[linear-gradient(145deg,rgba(148,163,184,0.18),rgba(10,23,64,0.96))]";
   }
 
-  return "border-lindao-blue/30 bg-lindao-blue-soft";
+  return "border-lindao-blue/50 bg-[linear-gradient(145deg,rgba(37,99,235,0.22),rgba(10,23,64,0.96))]";
 }
 
 export default async function RankingPage() {
@@ -53,6 +54,27 @@ export default async function RankingPage() {
         title="Ranking Clube do Lindao"
         description="Acompanhe os clientes com maior pontuacao no clube de vantagens."
       />
+
+      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_84%_26%,rgba(245,197,24,0.18),transparent_18rem),linear-gradient(135deg,rgba(24,67,184,0.9),rgba(6,15,46,0.96))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.32)] sm:p-8">
+        <div className="relative z-[1] max-w-2xl space-y-3">
+          <Badge>Programa de Fidelidade Oficial</Badge>
+          <h2 className="text-3xl font-black text-white sm:text-5xl">
+            Comprou, pontuou, ganhou.
+          </h2>
+          <p className="max-w-xl text-base leading-7 text-slate-200">
+            Consulte o desempenho dos clientes ativos e acompanhe quem esta no
+            topo do Clube do Lindao.
+          </p>
+        </div>
+        <Image
+          src="/images/boneco2.PNG"
+          alt=""
+          width={300}
+          height={360}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 right-2 hidden max-h-[260px] w-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)] md:block"
+        />
+      </section>
 
       {error ? (
         <Alert variant="error" title="Nao foi possivel carregar o ranking">
@@ -90,10 +112,10 @@ export default async function RankingPage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold uppercase tracking-wide text-lindao-blue">
+                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-200">
                         {customer.level_name ?? "Sem nivel"}
                       </span>
-                      <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold uppercase tracking-wide text-lindao-navy">
+                      <span className="rounded-full bg-lindao-gold/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-lindao-gold">
                         {formatPoints(Number(customer.total_points))} pontos
                       </span>
                     </div>
@@ -124,10 +146,10 @@ export default async function RankingPage() {
                         {customer.customer_name}
                       </h3>
                       <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide">
-                        <span className="rounded-full bg-lindao-gold-soft px-3 py-1 text-lindao-navy">
+                        <span className="rounded-full bg-lindao-gold/15 px-3 py-1 text-lindao-gold">
                           {customer.customer_code ?? "Sem codigo"}
                         </span>
-                        <span className="rounded-full bg-lindao-blue-soft px-3 py-1 text-lindao-blue">
+                        <span className="rounded-full bg-lindao-blue/20 px-3 py-1 text-slate-200">
                           {customer.level_name ?? "Sem nivel"}
                         </span>
                       </div>

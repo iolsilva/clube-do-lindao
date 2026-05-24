@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -44,10 +45,10 @@ type MetricCardProps = {
 };
 
 const metricTones: Record<MetricCardProps["tone"], string> = {
-  blue: "border-lindao-blue/25 bg-lindao-blue-soft",
-  gold: "border-lindao-gold/40 bg-lindao-gold-soft",
-  green: "border-emerald-200 bg-emerald-50",
-  navy: "border-lindao-navy/15 bg-white",
+  blue: "border-lindao-blue/40 bg-lindao-blue/20",
+  gold: "border-lindao-gold/45 bg-lindao-gold/15",
+  green: "border-emerald-300/30 bg-emerald-400/10",
+  navy: "border-white/10 bg-white/8",
 };
 
 function getCustomerFromPurchase(customer: PurchaseRow["customers"]) {
@@ -62,17 +63,17 @@ function MetricCard({ detail, label, tone, value }: MetricCardProps) {
   return (
     <div
       className={cn(
-        "rounded-lg border p-5 shadow-[0_18px_50px_rgba(12,36,72,0.07)]",
+        "rounded-lg border p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-lindao-gold/45",
         metricTones[tone],
       )}
     >
-      <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+      <p className="text-xs font-black uppercase tracking-wide text-lindao-muted">
         {label}
       </p>
-      <p className="mt-3 text-3xl font-black text-lindao-navy sm:text-4xl">
+      <p className="mt-3 text-3xl font-black text-white sm:text-4xl">
         {value}
       </p>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{detail}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{detail}</p>
     </div>
   );
 }
@@ -84,9 +85,9 @@ function InlineEmptyState({
   title: string;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-lindao-line bg-slate-50/70 p-6">
-      <p className="font-black text-lindao-navy">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+    <div className="rounded-lg border border-dashed border-lindao-gold/25 bg-white/5 p-6">
+      <p className="font-black text-white">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -171,6 +172,40 @@ export default async function AdminDashboardPage() {
           estao aplicadas.
         </Alert>
       ) : null}
+
+      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_78%_18%,rgba(245,197,24,0.2),transparent_18rem),linear-gradient(135deg,rgba(24,67,184,0.88),rgba(6,15,46,0.96))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-8">
+        <div className="relative z-[1] max-w-2xl space-y-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <Image
+              src="/images/logo.PNG"
+              alt="Clube do Lindao"
+              width={72}
+              height={72}
+              priority
+              className="rounded-md bg-white p-1 shadow-[0_16px_36px_rgba(0,0,0,0.24)]"
+            />
+            <Badge>Programa de Fidelidade Oficial</Badge>
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-white sm:text-5xl">
+              Comprou, pontuou, ganhou.
+            </h2>
+            <p className="mt-3 max-w-xl text-base leading-7 text-slate-200">
+              Painel administrativo do Clube do Lindao para acompanhar clientes,
+              compras, pontos e premios do Deposito Sao Marcos.
+            </p>
+          </div>
+        </div>
+        <Image
+          src="/images/boneco1.PNG"
+          alt=""
+          width={360}
+          height={420}
+          priority
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 right-4 hidden max-h-[310px] w-auto object-contain drop-shadow-[0_24px_40px_rgba(0,0,0,0.32)] md:block"
+        />
+      </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard

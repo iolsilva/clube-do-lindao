@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/layout/public-shell";
+import Image from "next/image";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,27 @@ export default async function PremiosPage() {
         description="Veja os premios ativos disponiveis para troca no Clube do Lindao."
       />
 
+      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_82%_20%,rgba(245,197,24,0.18),transparent_17rem),linear-gradient(135deg,rgba(6,15,46,0.96),rgba(24,67,184,0.86))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.32)] sm:p-8">
+        <div className="relative z-[1] max-w-2xl space-y-3">
+          <Badge>Premios oficiais</Badge>
+          <h2 className="text-3xl font-black text-white sm:text-5xl">
+            Troque pontos por vantagens.
+          </h2>
+          <p className="max-w-xl text-base leading-7 text-slate-200">
+            Premios ativos do Clube do Lindao aparecem aqui com a pontuacao
+            necessaria para resgate.
+          </p>
+        </div>
+        <Image
+          src="/images/boneco3.PNG"
+          alt=""
+          width={300}
+          height={360}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 right-3 hidden max-h-[250px] w-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)] md:block"
+        />
+      </section>
+
       {error ? (
         <Alert variant="error" title="Nao foi possivel carregar os premios">
           Nao foi possivel carregar os premios agora.
@@ -47,7 +69,7 @@ export default async function PremiosPage() {
       ) : (
         <>
           {featuredReward ? (
-            <section className="overflow-hidden rounded-lg border border-lindao-gold bg-lindao-gold-soft">
+            <section className="overflow-hidden rounded-lg border border-lindao-gold/45 bg-lindao-gold/15 shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
               <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
                 <div className="space-y-4">
                   <Badge>Menor pontuacao</Badge>
@@ -61,8 +83,8 @@ export default async function PremiosPage() {
                     </p>
                   </div>
                 </div>
-                <div className="rounded-lg bg-white/80 p-5 text-left md:text-right">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                <div className="rounded-lg border border-white/10 bg-white/10 p-5 text-left md:text-right">
+                  <p className="text-xs font-bold uppercase tracking-wide text-lindao-muted">
                     Pontos necessarios
                   </p>
                   <p className="mt-2 text-4xl font-black text-lindao-navy">

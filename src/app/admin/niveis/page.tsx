@@ -144,7 +144,7 @@ export default async function AdminNiveisPage({
                 return (
                   <div
                     key={level.id}
-                    className="grid gap-5 rounded-lg border border-lindao-line bg-white p-5"
+                    className="grid gap-5 rounded-lg border border-white/10 bg-white/5 p-5"
                   >
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="space-y-2">

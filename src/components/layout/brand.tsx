@@ -1,17 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
 
-export function Brand() {
+type BrandProps = {
+  href?: string;
+};
+
+export function Brand({ href = "/ranking" }: BrandProps) {
   return (
-    <Link href="/ranking" className="flex items-center gap-3">
-      <span className="flex size-11 items-center justify-center rounded-md border border-lindao-gold/40 bg-lindao-gold text-base font-black text-lindao-navy shadow-[0_12px_28px_rgba(214,166,44,0.28)]">
-        CL
+    <Link href={href} className="flex items-center gap-3">
+      <span className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-lindao-gold/40 bg-white shadow-[0_16px_32px_rgba(245,197,24,0.24)]">
+        <Image
+          src="/images/logo.PNG"
+          alt="Clube do Lindao"
+          fill
+          priority
+          sizes="56px"
+          className="object-contain p-1"
+        />
       </span>
       <span className="leading-tight">
-        <span className="block text-sm font-black uppercase tracking-wide text-lindao-navy">
-          Clube do Lindão
+        <span className="block text-sm font-black uppercase tracking-wide text-white">
+          Clube do Lindao
         </span>
-        <span className="block text-xs font-medium text-slate-500">
-          Vantagens para clientes
+        <span className="block text-xs font-bold text-lindao-gold">
+          Deposito Sao Marcos
         </span>
       </span>
     </Link>

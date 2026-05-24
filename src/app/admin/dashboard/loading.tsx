@@ -15,7 +15,7 @@ export default function AdminDashboardLoading() {
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
-            className="rounded-lg border border-lindao-line bg-white p-5 shadow-[0_18px_50px_rgba(12,36,72,0.07)]"
+            className="rounded-lg border border-white/10 bg-white/5 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.2)]"
           >
             <Skeleton className="h-3 w-32" />
             <Skeleton className="mt-4 h-10 w-24" />
@@ -48,4 +48,3 @@ export default function AdminDashboardLoading() {
     </>
   );
 }
-

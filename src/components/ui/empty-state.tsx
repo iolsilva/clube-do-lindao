@@ -9,7 +9,7 @@ type EmptyStateProps = {
 
 export function EmptyState({ eyebrow, title, description }: EmptyStateProps) {
   return (
-    <Card className="border-dashed bg-white/85">
+    <Card className="border-dashed border-lindao-gold/25">
       <CardContent className="flex min-h-56 flex-col items-start justify-center gap-4">
         {eyebrow ? <Badge>{eyebrow}</Badge> : null}
         <div className="space-y-2">

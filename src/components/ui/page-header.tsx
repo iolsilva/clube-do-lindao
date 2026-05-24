@@ -11,11 +11,11 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
     <header className="space-y-4">
       {eyebrow ? <Badge>{eyebrow}</Badge> : null}
       <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-normal text-lindao-navy sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">
           {title}
         </h1>
         {description ? (
-          <p className="max-w-3xl text-base leading-7 text-slate-600">
+          <p className="max-w-3xl text-base leading-7 text-lindao-muted">
             {description}
           </p>
         ) : null}
