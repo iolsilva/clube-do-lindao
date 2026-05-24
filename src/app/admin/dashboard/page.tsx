@@ -98,11 +98,11 @@ function InlineEmptyState({
 
 function getRankStyle(position: number) {
   if (position === 1) {
-    return "bg-lindao-gold text-lindao-navy";
+    return "bg-lindao-gold !text-lindao-navy";
   }
 
   if (position === 2) {
-    return "bg-slate-200 text-lindao-navy";
+    return "bg-slate-200 !text-lindao-navy";
   }
 
   if (position === 3) {
@@ -255,7 +255,7 @@ export default async function AdminDashboardPage() {
               </div>
               <Link
                 href="/admin/ranking"
-                className="text-sm font-black text-lindao-blue hover:text-lindao-navy"
+                className="text-sm font-black text-lindao-blue hover:text-white"
               >
                 Ver completo
               </Link>

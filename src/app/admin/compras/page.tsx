@@ -317,7 +317,7 @@ export default async function AdminComprasPage({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-lindao-line text-xs font-bold uppercase tracking-wide text-slate-500">
+                  <tr className="border-b border-lindao-line text-xs font-bold uppercase tracking-wide text-lindao-muted">
                     <th className="py-3 pr-4">Data</th>
                     <th className="py-3 pr-4">Cliente</th>
                     <th className="py-3 pr-4">Valor</th>
@@ -340,24 +340,24 @@ export default async function AdminComprasPage({
                         key={purchase.id}
                         className="border-b border-lindao-line last:border-0"
                       >
-                        <td className="py-4 pr-4 font-medium text-lindao-navy">
+                        <td className="py-4 pr-4 font-medium text-slate-100">
                           {formatDateTime(purchase.purchased_at)}
                         </td>
                         <td className="py-4 pr-4">
-                          <div className="font-semibold text-lindao-navy">
+                          <div className="font-semibold text-white">
                             {customer?.name ?? "Cliente removido"}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-slate-400">
                             {customer?.code ?? ""}
                           </div>
                         </td>
-                        <td className="py-4 pr-4 text-slate-600">
+                        <td className="py-4 pr-4 font-semibold text-emerald-300">
                           {formatCurrencyFromCents(purchase.amount_cents)}
                         </td>
-                        <td className="py-4 pr-4 font-bold text-lindao-blue">
+                        <td className="py-4 pr-4 font-bold text-lindao-gold">
                           {formatPoints(points)} pontos
                         </td>
-                        <td className="py-4 pr-4 text-slate-600">
+                        <td className="py-4 pr-4 text-slate-300">
                           {purchase.notes || "-"}
                         </td>
                       </tr>

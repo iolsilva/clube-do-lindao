@@ -221,7 +221,7 @@ export default async function AdminRankingPage({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[920px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-lindao-line text-xs font-bold uppercase tracking-wide text-slate-500">
+                  <tr className="border-b border-lindao-line text-xs font-bold uppercase tracking-wide text-lindao-muted">
                     <th className="py-3 pr-4">Posicao</th>
                     <th className="py-3 pr-4">Cliente</th>
                     <th className="py-3 pr-4">Documento</th>
@@ -243,30 +243,30 @@ export default async function AdminRankingPage({
                         </span>
                       </td>
                       <td className="py-4 pr-4">
-                        <div className="font-bold text-lindao-navy">
+                        <div className="font-bold text-white">
                           {customer.customer_name}
                         </div>
-                        <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
                           {customer.customer_code ?? "Sem codigo"}
                         </div>
                       </td>
-                      <td className="py-4 pr-4 text-slate-600">
+                      <td className="py-4 pr-4 text-slate-300">
                         {formatDocument(
                           customer.document,
                           customer.document_type,
                         )}
                       </td>
-                      <td className="py-4 pr-4 text-slate-600">
+                      <td className="py-4 pr-4 text-slate-300">
                         {customer.phone ? formatPhone(customer.phone) : "-"}
                       </td>
-                      <td className="py-4 pr-4 text-slate-600">
+                      <td className="py-4 pr-4 text-slate-300">
                         {customer.level_name ?? "Sem nivel"}
                       </td>
                       <td className="py-4 pr-4">
-                        <div className="font-black text-lindao-blue">
+                        <div className="font-black text-lindao-gold">
                           {formatPoints(Number(customer.total_points))}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-400">
                           {formatPoints(Number(customer.available_points))} disp.
                         </div>
                       </td>

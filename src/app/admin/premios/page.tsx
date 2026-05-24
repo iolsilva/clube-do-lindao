@@ -186,7 +186,7 @@ export default async function AdminPremiosPage({
                   </div>
 
                   <details>
-                    <summary className="cursor-pointer text-sm font-bold text-lindao-blue hover:text-lindao-navy">
+                    <summary className="cursor-pointer text-sm font-bold text-lindao-blue hover:text-white">
                       Editar premio
                     </summary>
                     <div className="mt-5 border-t border-lindao-line pt-5">

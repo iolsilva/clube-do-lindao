@@ -74,10 +74,10 @@ export default async function PremiosPage() {
                 <div className="space-y-4">
                   <Badge>Menor pontuacao</Badge>
                   <div>
-                    <h2 className="text-3xl font-black text-lindao-navy">
+                    <h2 className="text-3xl font-black text-white">
                       {featuredReward.name}
                     </h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200">
                       {featuredReward.description ||
                         "Premio ativo disponivel para clientes participantes."}
                     </p>
@@ -87,7 +87,7 @@ export default async function PremiosPage() {
                   <p className="text-xs font-bold uppercase tracking-wide text-lindao-muted">
                     Pontos necessarios
                   </p>
-                  <p className="mt-2 text-4xl font-black text-lindao-navy">
+                  <p className="mt-2 text-4xl font-black text-white">
                     {formatPoints(Number(featuredReward.points_required))}
                   </p>
                 </div>
