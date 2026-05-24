@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { toggleCustomerStatusAction } from "@/app/admin/clientes/actions";
 import {
   CustomerForm,
@@ -57,10 +58,10 @@ function buildSearchFilter(search: string) {
 
 function getLevelName(levels: CustomerRow["levels"]) {
   if (Array.isArray(levels)) {
-    return levels[0]?.name ?? "Sem nivel";
+    return levels[0]?.name ?? "Sem nível";
   }
 
-  return levels?.name ?? "Sem nivel";
+  return levels?.name ?? "Sem nível";
 }
 
 function getStatusMessage(status?: string) {
@@ -68,8 +69,8 @@ function getStatusMessage(status?: string) {
     activated: "Cliente ativado com sucesso.",
     created: "Cliente cadastrado com sucesso.",
     deactivated: "Cliente inativado com sucesso.",
-    invalid: "Cliente invalido.",
-    "status-error": "Nao foi possivel alterar o status do cliente.",
+    invalid: "Cliente inválido.",
+    "status-error": "Não foi possível alterar o status do cliente.",
     updated: "Cliente atualizado com sucesso.",
   };
 
@@ -142,146 +143,204 @@ export default async function AdminClientesPage({
         </Alert>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <h2 className="text-xl font-bold text-lindao-navy">Novo cliente</h2>
-        </CardHeader>
-        <CardContent>
-          <CustomerForm mode="create" levels={levels} />
-        </CardContent>
-      </Card>
+      <section className="grid gap-5 xl:grid-cols-[minmax(300px,0.38fr)_minmax(0,0.62fr)] xl:items-start">
+        <Card className="overflow-hidden xl:sticky xl:top-28">
+          <CardHeader className="p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-lindao-gold">
+                  Cadastro
+                </p>
+                <h2 className="mt-1 text-lg font-black text-white">
+                  Novo cliente
+                </h2>
+              </div>
+              <Badge className="px-2.5 py-0.5">Código automático</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <CustomerForm mode="create" levels={levels} />
+          </CardContent>
+        </Card>
 
-      <section className="grid gap-4">
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
-          <form className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
-            <label className="sr-only" htmlFor="customer-search">
-              Buscar clientes
-            </label>
-            <input
-              id="customer-search"
-              name="q"
-              defaultValue={search}
-              className="h-11 rounded-md border border-lindao-line bg-white px-3 text-sm text-lindao-navy outline-none transition-colors placeholder:text-slate-400 focus:border-lindao-blue focus:ring-2 focus:ring-lindao-blue/15"
-              placeholder="Buscar por nome, CPF/CNPJ, telefone ou codigo"
-            />
-            <Button type="submit">Buscar</Button>
-            {search ? (
-              <Link
-                href="/admin/clientes"
-                className="inline-flex h-10 items-center justify-center rounded-md border border-lindao-gold/30 px-4 text-sm font-semibold text-lindao-gold transition-colors hover:bg-lindao-gold/10"
-              >
-                Limpar
-              </Link>
-            ) : null}
-          </form>
-        </div>
+        <Card className="overflow-hidden">
+          <CardHeader className="space-y-4 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-lindao-gold">
+                  Base de clientes
+                </p>
+                <h2 className="mt-1 text-lg font-black text-white">
+                  Clientes cadastrados
+                </h2>
+              </div>
+              <Badge className="w-fit px-2.5 py-0.5">
+                {customers.length} {customers.length === 1 ? "cliente" : "clientes"}
+              </Badge>
+            </div>
 
-        {loadError ? (
-          <Alert variant="error" title="Nao foi possivel carregar os clientes">
-            Tente novamente em alguns instantes.
-          </Alert>
-        ) : customers.length === 0 ? (
-          <EmptyState
-            eyebrow={search ? "Sem resultados" : "Sem clientes"}
-            title={
-              search
-                ? "Nenhum cliente encontrado"
-                : "Nenhum cliente cadastrado"
-            }
-            description={
-              search
-                ? "Tente buscar por outro nome, documento, telefone ou codigo."
-                : "Use o formulario acima para cadastrar o primeiro cliente."
-            }
-          />
-        ) : (
-          <div className="grid gap-4">
-            {customers.map((customer) => (
-              <Card key={customer.id}>
-                <CardContent className="grid gap-5">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge>{customer.code ?? "Sem codigo"}</Badge>
-                        <span
-                          className={cn(
-                            "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide",
-                            customer.active
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-500",
-                          )}
-                        >
-                          {customer.active ? "Ativo" : "Inativo"}
-                        </span>
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-bold text-lindao-navy">
+            <form className="flex flex-col gap-2 sm:flex-row">
+              <label className="sr-only" htmlFor="customer-search">
+                Buscar clientes
+              </label>
+              <div className="relative min-w-0 flex-1">
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-500"
+                />
+                <input
+                  id="customer-search"
+                  name="q"
+                  defaultValue={search}
+                  className="h-10 w-full rounded-md border border-lindao-line bg-white py-2 pl-9 pr-3 text-sm text-lindao-navy outline-none transition-colors placeholder:text-slate-400 focus:border-lindao-gold focus:ring-2 focus:ring-lindao-gold/20"
+                  placeholder="Buscar por nome, CPF/CNPJ, telefone ou código"
+                />
+              </div>
+              <Button type="submit" className="h-10 px-4">
+                Buscar
+              </Button>
+              {search ? (
+                <Link
+                  href="/admin/clientes"
+                  className="inline-flex h-10 items-center justify-center rounded-md border border-lindao-gold/35 px-4 text-sm font-black text-lindao-gold transition duration-200 hover:-translate-y-0.5 hover:bg-lindao-gold/10"
+                >
+                  Limpar
+                </Link>
+              ) : null}
+            </form>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            {loadError ? (
+              <div className="p-4">
+                <Alert
+                  variant="error"
+                  title="Não foi possível carregar os clientes"
+                >
+                  Tente novamente em alguns instantes.
+                </Alert>
+              </div>
+            ) : customers.length === 0 ? (
+              <div className="p-4">
+                <EmptyState
+                  eyebrow={search ? "Sem resultados" : "Sem clientes"}
+                  title={
+                    search
+                      ? "Nenhum cliente encontrado"
+                      : "Nenhum cliente cadastrado"
+                  }
+                  description={
+                    search
+                      ? "Tente buscar por outro nome, documento, telefone ou código."
+                      : "Cadastre o primeiro cliente para iniciar a base."
+                  }
+                />
+              </div>
+            ) : (
+              <div className="divide-y divide-white/10">
+                <div className="hidden grid-cols-[minmax(170px,1.35fr)_minmax(120px,0.9fr)_minmax(112px,0.85fr)_minmax(112px,0.8fr)_110px] gap-3 bg-white/[0.035] px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 lg:grid">
+                  <span>Cliente</span>
+                  <span>Documento</span>
+                  <span>Telefone</span>
+                  <span>Nível</span>
+                  <span className="text-right">Status</span>
+                </div>
+
+                {customers.map((customer) => (
+                  <article
+                    key={customer.id}
+                    className="px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
+                  >
+                    <div className="grid gap-3 lg:grid-cols-[minmax(170px,1.35fr)_minmax(120px,0.9fr)_minmax(112px,0.85fr)_minmax(112px,0.8fr)_110px] lg:items-center">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge className="px-2.5 py-0.5">
+                            {customer.code ?? "Sem código"}
+                          </Badge>
+                          <span
+                            className={cn(
+                              "rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.14em]",
+                              customer.active
+                                ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-300"
+                                : "border-slate-400/20 bg-white/5 text-slate-300",
+                            )}
+                          >
+                            {customer.active ? "Ativo" : "Inativo"}
+                          </span>
+                        </div>
+                        <h3 className="mt-2 truncate text-sm font-black text-white">
                           {customer.name}
-                        </h2>
-                        <p className="text-sm text-slate-600">
+                        </h3>
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                          Documento
+                        </p>
+                        <p className="truncate text-sm font-semibold text-slate-200">
+                          {formatDocument(
+                            customer.document,
+                            customer.document_type,
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                          Telefone
+                        </p>
+                        <p className="truncate text-sm font-semibold text-slate-200">
+                          {formatPhone(customer.phone)}
+                        </p>
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                          Nível
+                        </p>
+                        <p className="truncate text-sm font-semibold text-slate-200">
                           {getLevelName(customer.levels)}
                         </p>
                       </div>
-                    </div>
 
-                    <form action={toggleCustomerStatusAction}>
-                      <input type="hidden" name="id" value={customer.id} />
-                      <input
-                        type="hidden"
-                        name="active"
-                        value={String(customer.active)}
-                      />
-                      <Button
-                        type="submit"
-                        variant={customer.active ? "secondary" : "primary"}
+                      <form
+                        action={toggleCustomerStatusAction}
+                        className="flex lg:justify-end"
                       >
-                        {customer.active ? "Inativar" : "Ativar"}
-                      </Button>
-                    </form>
-                  </div>
+                        <input type="hidden" name="id" value={customer.id} />
+                        <input
+                          type="hidden"
+                          name="active"
+                          value={String(customer.active)}
+                        />
+                        <Button
+                          type="submit"
+                          variant={customer.active ? "secondary" : "primary"}
+                          className="h-8 px-3 text-xs"
+                        >
+                          {customer.active ? "Inativar" : "Ativar"}
+                        </Button>
+                      </form>
+                    </div>
 
-                  <dl className="grid gap-4 border-y border-lindao-line py-4 text-sm sm:grid-cols-3">
-                    <div>
-                      <dt className="font-semibold text-lindao-navy">
-                        Documento
-                      </dt>
-                      <dd className="mt-1 text-slate-600">
-                        {formatDocument(customer.document, customer.document_type)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold text-lindao-navy">
-                        Telefone
-                      </dt>
-                      <dd className="mt-1 text-slate-600">
-                        {formatPhone(customer.phone)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold text-lindao-navy">Nivel</dt>
-                      <dd className="mt-1 text-slate-600">
-                        {getLevelName(customer.levels)}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <details>
-                    <summary className="cursor-pointer text-sm font-bold text-lindao-blue hover:text-white">
-                      Editar cliente
-                    </summary>
-                    <div className="mt-5 border-t border-lindao-line pt-5">
-                      <CustomerForm
-                        mode="edit"
-                        levels={levels}
-                        customer={toFormCustomer(customer)}
-                      />
-                    </div>
-                  </details>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                    <details className="mt-3">
+                      <summary className="inline-flex h-8 cursor-pointer list-none items-center rounded-md border border-lindao-gold/30 px-3 text-xs font-black text-lindao-gold transition duration-200 hover:-translate-y-0.5 hover:bg-lindao-gold/10">
+                        Editar cliente
+                      </summary>
+                      <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.035] p-4">
+                        <CustomerForm
+                          mode="edit"
+                          levels={levels}
+                          customer={toFormCustomer(customer)}
+                        />
+                      </div>
+                    </details>
+                  </article>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </>
   );
