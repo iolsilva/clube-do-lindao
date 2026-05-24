@@ -181,7 +181,7 @@ export function CustomerForm({ customer, levels, mode }: CustomerFormProps) {
           name="active"
           type="checkbox"
           defaultChecked={values?.active ?? customer?.active ?? true}
-          className="size-4 rounded border-lindao-line text-lindao-blue"
+          className="size-4 align-middle accent-lindao-gold"
         />
         Cliente ativo
       </label>

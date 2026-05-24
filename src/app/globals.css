@@ -36,6 +36,36 @@ a {
   text-underline-offset: 4px;
 }
 
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background: #ffffff !important;
+  border-color: rgba(148, 163, 184, 0.55) !important;
+  caret-color: #0f172a;
+  color: #0f172a !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  border-color: #f5c518 !important;
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.2);
+  outline: none;
+}
+
+input[type="checkbox"] {
+  accent-color: #f5c518;
+  height: 1rem;
+  vertical-align: middle;
+  width: 1rem;
+}
+
 body::before {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),

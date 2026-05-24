@@ -112,7 +112,7 @@ export function RewardForm({ mode, reward }: RewardFormProps) {
           name="active"
           type="checkbox"
           defaultChecked={values?.active ?? reward?.active ?? true}
-          className="size-4 rounded border-lindao-line text-lindao-blue"
+          className="size-4 align-middle accent-lindao-gold"
         />
         Premio ativo
       </label>

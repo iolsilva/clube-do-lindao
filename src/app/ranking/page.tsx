@@ -97,7 +97,7 @@ export default async function RankingPage() {
               >
                 <CardContent className="grid min-h-56 content-between gap-6">
                   <div className="flex items-start justify-between gap-3">
-                    <Badge>Top {customer.position}</Badge>
+                    <Badge>Destaque {customer.position}</Badge>
                     <span className="text-4xl font-black text-lindao-navy">
                       #{customer.position}
                     </span>

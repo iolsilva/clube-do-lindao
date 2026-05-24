@@ -110,9 +110,6 @@ export function PurchaseForm({
         <p className="mt-1 text-2xl font-black text-lindao-navy">
           {previewPoints === null ? "0" : formatPoints(previewPoints)} pontos
         </p>
-        <p className="mt-1 text-xs text-slate-600">
-          O valor final e validado novamente no servidor antes de salvar.
-        </p>
       </div>
 
       <div className="grid gap-2">

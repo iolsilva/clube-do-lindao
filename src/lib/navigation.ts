@@ -4,7 +4,7 @@ export const publicNavigation = [
 ];
 
 export const adminNavigation = [
-  { href: "/admin/dashboard", label: "Dashboard" },
+  { href: "/admin/dashboard", label: "Painel" },
   { href: "/admin/clientes", label: "Clientes" },
   { href: "/admin/compras", label: "Compras" },
   { href: "/admin/ranking", label: "Ranking" },

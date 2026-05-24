@@ -55,11 +55,7 @@ export default async function AdminPremiosPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Premios"
-        description="Cadastre, edite e controle os premios disponiveis para clientes."
-      />
+      <PageHeader eyebrow="Admin" title="Premios" />
 
       {statusMessage ? (
         <Alert
@@ -75,8 +71,7 @@ export default async function AdminPremiosPage({
 
       {error ? (
         <Alert variant="error" title="Nao foi possivel carregar os premios">
-          Nao foi possivel carregar os premios. Confira as permissoes do
-          usuario admin no Supabase.
+          Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
@@ -115,12 +110,7 @@ export default async function AdminPremiosPage({
 
       <Card>
         <CardHeader>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-lindao-navy">Novo premio</h2>
-            <p className="text-sm leading-6 text-slate-600">
-              Apenas premios ativos aparecem na pagina publica.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-lindao-navy">Novo premio</h2>
         </CardHeader>
         <CardContent>
           <RewardForm mode="create" />
@@ -134,9 +124,6 @@ export default async function AdminPremiosPage({
               <h2 className="text-xl font-bold text-lindao-navy">
                 Premios cadastrados
               </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                Gerencie disponibilidade e pontos necessarios.
-              </p>
             </div>
             <Badge>{rewards.length} premios</Badge>
           </div>

@@ -162,14 +162,13 @@ export default async function AdminDashboardPage() {
     <>
       <PageHeader
         eyebrow="Admin"
-        title="Dashboard"
-        description="Visao executiva do Clube do Lindao com clientes, compras, pontos e movimentacoes recentes."
+        title="Painel"
+        description="Indicadores do Clube do Lindao."
       />
 
       {loadError ? (
-        <Alert variant="error" title="Nao foi possivel atualizar o dashboard">
-          Confira se o usuario logado tem perfil admin e se as views do Supabase
-          estao aplicadas.
+        <Alert variant="error" title="Nao foi possivel atualizar o painel">
+          Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
@@ -182,7 +181,7 @@ export default async function AdminDashboardPage() {
               width={72}
               height={72}
               priority
-              className="rounded-md bg-white p-1 shadow-[0_16px_36px_rgba(0,0,0,0.24)]"
+              className="object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
             />
             <Badge>Programa de Fidelidade Oficial</Badge>
           </div>
@@ -240,11 +239,8 @@ export default async function AdminDashboardPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <h2 className="text-xl font-black text-lindao-navy">
-                  Top 5 ranking
+                  5 melhores no ranking
                 </h2>
-                <p className="text-sm leading-6 text-slate-600">
-                  Clientes com maior pontuacao total.
-                </p>
               </div>
               <Link
                 href="/admin/ranking"

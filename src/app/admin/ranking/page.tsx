@@ -111,16 +111,11 @@ export default async function AdminRankingPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Ranking"
-        description="Ranking completo calculado no PostgreSQL com DENSE_RANK, mantendo empates na mesma posicao."
-      />
+      <PageHeader eyebrow="Admin" title="Ranking" />
 
       {error ? (
         <Alert variant="error" title="Nao foi possivel carregar o ranking">
-          Nao foi possivel carregar o ranking. Confira se as views do Supabase
-          foram atualizadas.
+          Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
@@ -159,14 +154,9 @@ export default async function AdminRankingPage({
 
       <Card>
         <CardHeader>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-lindao-navy">
-              Buscar e filtrar
-            </h2>
-            <p className="text-sm leading-6 text-slate-600">
-              Pesquise por nome, codigo, nivel, CPF/CNPJ ou telefone.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-lindao-navy">
+            Buscar e filtrar
+          </h2>
         </CardHeader>
         <CardContent>
           <form className="grid gap-3 lg:grid-cols-[1fr_180px_auto_auto]">

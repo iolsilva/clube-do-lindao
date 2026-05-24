@@ -74,11 +74,7 @@ export default async function AdminNiveisPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Niveis"
-        description="Crie e ordene os niveis usados para classificar clientes no Clube do Lindao."
-      />
+      <PageHeader eyebrow="Admin" title="Niveis" />
 
       {statusMessage ? (
         <Alert
@@ -96,19 +92,13 @@ export default async function AdminNiveisPage({
 
       {loadError ? (
         <Alert variant="error" title="Nao foi possivel carregar os niveis">
-          Nao foi possivel carregar os niveis. Confira as permissoes do usuario
-          admin no Supabase.
+          Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
       <Card>
         <CardHeader>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-lindao-navy">Novo nivel</h2>
-            <p className="text-sm leading-6 text-slate-600">
-              A ordem define como os niveis aparecem nos cadastros e filtros.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-lindao-navy">Novo nivel</h2>
         </CardHeader>
         <CardContent>
           <LevelForm mode="create" />
@@ -122,9 +112,6 @@ export default async function AdminNiveisPage({
               <h2 className="text-xl font-bold text-lindao-navy">
                 Niveis cadastrados
               </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                Niveis em uso por clientes nao podem ser excluidos.
-              </p>
             </div>
             <Badge>{levels.length} niveis</Badge>
           </div>

@@ -128,11 +128,7 @@ export default async function AdminClientesPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Clientes"
-        description="Cadastre, edite, busque e controle os clientes participantes do Clube do Lindao."
-      />
+      <PageHeader eyebrow="Admin" title="Clientes" />
 
       {statusMessage ? (
         <Alert
@@ -148,14 +144,7 @@ export default async function AdminClientesPage({
 
       <Card>
         <CardHeader>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-lindao-navy">
-              Novo cliente
-            </h2>
-            <p className="text-sm leading-6 text-slate-600">
-              O codigo e gerado automaticamente no formato PrimeiroNome - #001.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-lindao-navy">Novo cliente</h2>
         </CardHeader>
         <CardContent>
           <CustomerForm mode="create" levels={levels} />
@@ -189,9 +178,7 @@ export default async function AdminClientesPage({
 
         {loadError ? (
           <Alert variant="error" title="Nao foi possivel carregar os clientes">
-            Nao foi possivel carregar os clientes. Confira se o usuario logado
-            possui perfil de administrador e se o schema do Supabase esta
-            atualizado.
+            Tente novamente em alguns instantes.
           </Alert>
         ) : customers.length === 0 ? (
           <EmptyState

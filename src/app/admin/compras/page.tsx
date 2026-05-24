@@ -142,11 +142,7 @@ export default async function AdminComprasPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Compras"
-        description="Registre compras vinculadas ao cliente e gere pontos automaticamente."
-      />
+      <PageHeader eyebrow="Admin" title="Compras" />
 
       {statusMessage ? (
         <Alert variant="success">{statusMessage}</Alert>
@@ -154,21 +150,15 @@ export default async function AdminComprasPage({
 
       {loadError ? (
         <Alert variant="error" title="Nao foi possivel carregar as compras">
-          Nao foi possivel carregar os dados de compras. Confira se o schema do
-          Supabase esta atualizado e se o usuario possui perfil admin.
+          Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
       <Card>
         <CardHeader>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-lindao-navy">
-              Buscar cliente
-            </h2>
-            <p className="text-sm leading-6 text-slate-600">
-              Busque por nome, CPF/CNPJ, telefone ou codigo automatico.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-lindao-navy">
+            Buscar cliente
+          </h2>
         </CardHeader>
         <CardContent className="grid gap-5">
           <form className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
@@ -253,17 +243,10 @@ export default async function AdminComprasPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold text-lindao-navy">
-                Nova compra
-              </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                Pontos gerados = valor total x 0,1.
-              </p>
-            </div>
+            <h2 className="text-xl font-bold text-lindao-navy">Nova compra</h2>
           </CardHeader>
           <CardContent>
             {selectedCustomer ? (
@@ -304,29 +287,6 @@ export default async function AdminComprasPage({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold text-lindao-navy">
-                Como os pontos sao calculados
-              </h2>
-              <p className="text-sm leading-6 text-slate-600">
-                O servidor converte o valor para centavos e o PostgreSQL grava
-                os pontos pela regra oficial.
-              </p>
-            </div>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm text-slate-600">
-            <div className="rounded-md border border-lindao-gold/25 bg-lindao-gold/10 p-4">
-              <p className="font-bold text-lindao-navy">R$ 16,00</p>
-              <p>gera 1,6 pontos</p>
-            </div>
-            <div className="rounded-md border border-lindao-blue/30 bg-lindao-blue/15 p-4">
-              <p className="font-bold text-lindao-navy">R$ 100,00</p>
-              <p>gera 10 pontos</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>

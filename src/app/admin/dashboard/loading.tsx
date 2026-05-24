@@ -7,8 +7,8 @@ export default function AdminDashboardLoading() {
     <>
       <PageHeader
         eyebrow="Admin"
-        title="Dashboard"
-        description="Carregando indicadores do Clube do Lindao."
+        title="Painel"
+        description="Carregando indicadores."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

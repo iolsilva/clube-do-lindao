@@ -10,8 +10,8 @@ export default function LoginPage() {
     <PublicShell>
       <PageHeader
         eyebrow="Acesso administrativo"
-        title="Login"
-        description="Entre com uma conta autorizada no Supabase Auth para acessar a administracao."
+        title="Entrar"
+        description="Entre com sua conta administrativa."
       />
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-stretch">
         <div className="relative hidden overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_70%_20%,rgba(245,197,24,0.2),transparent_16rem),linear-gradient(135deg,rgba(24,67,184,0.86),rgba(6,15,46,0.96))] p-8 shadow-[0_28px_90px_rgba(0,0,0,0.32)] lg:block">
