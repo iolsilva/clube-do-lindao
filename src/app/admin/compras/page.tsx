@@ -338,7 +338,7 @@ export default async function AdminComprasPage({
                     return (
                       <tr
                         key={purchase.id}
-                        className="border-b border-lindao-line last:border-0"
+                        className="border-b border-lindao-line transition hover:bg-white/[0.04] last:border-0"
                       >
                         <td className="py-4 pr-4 font-medium text-slate-100">
                           {formatDateTime(purchase.purchased_at)}

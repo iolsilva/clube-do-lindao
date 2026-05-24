@@ -1,9 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
+import {
+  CircleDollarSign,
+  ReceiptText,
+  UserCheck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import {
   calculatePointsFromCents,
   formatCurrencyFromCents,
@@ -39,6 +45,7 @@ type PurchaseRow = {
 
 type MetricCardProps = {
   detail: string;
+  icon: LucideIcon;
   label: string;
   tone: "blue" | "gold" | "green" | "navy";
   value: string;
@@ -59,22 +66,29 @@ function getCustomerFromPurchase(customer: PurchaseRow["customers"]) {
   return customer;
 }
 
-function MetricCard({ detail, label, tone, value }: MetricCardProps) {
+function MetricCard({ detail, icon: Icon, label, tone, value }: MetricCardProps) {
   return (
     <div
       tabIndex={0}
       aria-label={`${label}. ${detail}`}
       className={cn(
-        "group relative rounded-lg border p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-lindao-gold/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lindao-gold",
+        "group relative rounded-lg border p-4 shadow-[0_18px_54px_rgba(0,0,0,0.24)] transition duration-200 hover:-translate-y-0.5 hover:border-lindao-gold/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lindao-gold",
         metricTones[tone],
       )}
     >
-      <p className="text-xs font-black uppercase tracking-wide text-lindao-muted">
-        {label}
-      </p>
-      <p className="mt-3 text-3xl font-black text-white sm:text-4xl">
-        {value}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-wide text-lindao-muted">
+            {label}
+          </p>
+          <p className="mt-2 text-3xl font-black text-white sm:text-4xl">
+            {value}
+          </p>
+        </div>
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-lindao-gold/25 bg-lindao-gold/10 text-lindao-gold">
+          <Icon aria-hidden="true" className="size-5" strokeWidth={2.4} />
+        </span>
+      </div>
       <span className="pointer-events-none absolute left-4 right-4 top-full z-20 mt-3 hidden translate-y-1 rounded-md border border-lindao-gold/40 bg-lindao-navy px-3 py-2 text-xs font-semibold leading-5 text-white opacity-0 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:block">
         {detail}
       </span>
@@ -164,15 +178,13 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Admin" title="Painel" />
-
       {loadError ? (
         <Alert variant="error" title="Nao foi possivel atualizar o painel">
           Tente novamente em alguns instantes.
         </Alert>
       ) : null}
 
-      <section className="relative min-h-[210px] overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_82%_18%,rgba(245,197,24,0.2),transparent_14rem),radial-gradient(circle_at_14%_0%,rgba(37,99,235,0.44),transparent_18rem),linear-gradient(135deg,#1843b8_0%,#10275f_48%,#060f2e_100%)] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-7">
+      <section className="relative min-h-[190px] overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_82%_18%,rgba(245,197,24,0.18),transparent_14rem),radial-gradient(circle_at_14%_0%,rgba(37,99,235,0.38),transparent_18rem),linear-gradient(135deg,#1843b8_0%,#10275f_48%,#060f2e_100%)] p-5 shadow-[0_24px_74px_rgba(0,0,0,0.32)] sm:p-6">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:38px_38px]"
@@ -206,12 +218,15 @@ export default async function AdminDashboardPage() {
             <Badge>Programa de Fidelidade Oficial</Badge>
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white sm:text-5xl">
+            <h1 className="text-3xl font-black text-white sm:text-4xl">
+              Dashboard do Clube do Lindão
+            </h1>
+            <h2 className="mt-1 text-xl font-black text-lindao-gold sm:text-2xl">
               Comprou, pontuou, ganhou.
             </h2>
-            <p className="mt-3 max-w-lg text-base leading-7 text-slate-200">
-              Acompanhe clientes, compras, pontos e premios do Deposito Sao
-              Marcos.
+            <p className="mt-3 max-w-lg text-sm leading-6 text-slate-200">
+              Indicadores essenciais do programa de fidelidade em um painel
+              compacto e executivo.
             </p>
           </div>
         </div>
@@ -219,24 +234,28 @@ export default async function AdminDashboardPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
+          icon={Users}
           label="Total de clientes"
           value={String(totalCustomersResult.count ?? 0)}
           detail="Clientes cadastrados no clube."
           tone="navy"
         />
         <MetricCard
+          icon={UserCheck}
           label="Clientes ativos"
           value={String(activeCustomersResult.count ?? 0)}
           detail="Clientes aptos a aparecer no ranking publico."
           tone="green"
         />
         <MetricCard
+          icon={ReceiptText}
           label="Total de compras"
           value={String(purchasesCountResult.count ?? 0)}
           detail="Historico de compras registradas."
           tone="blue"
         />
         <MetricCard
+          icon={CircleDollarSign}
           label="Pontos gerados"
           value={formatPoints(totalPoints)}
           detail="Soma dos pontos acumulados por compras."

@@ -14,7 +14,7 @@ export default function LoginPage() {
         description="Entre com sua conta administrativa."
       />
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-stretch">
-        <div className="relative hidden overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_70%_20%,rgba(245,197,24,0.2),transparent_16rem),linear-gradient(135deg,rgba(24,67,184,0.86),rgba(6,15,46,0.96))] p-8 shadow-[0_28px_90px_rgba(0,0,0,0.32)] lg:block">
+        <div className="relative hidden overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_70%_20%,rgba(245,197,24,0.2),transparent_16rem),linear-gradient(135deg,rgba(24,67,184,0.86),rgba(6,15,46,0.96))] p-7 shadow-[0_24px_74px_rgba(0,0,0,0.3)] lg:block">
           <div className="relative z-[1] max-w-md space-y-4">
             <Badge>Programa de Fidelidade Oficial</Badge>
             <h2 className="text-4xl font-black text-white">
@@ -25,12 +25,12 @@ export default function LoginPage() {
             </p>
           </div>
           <Image
-            src="/images/boneco4.png"
+            src="/images/boneco3.PNG"
             alt=""
-            width={330}
-            height={390}
+            width={260}
+            height={330}
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 right-3 max-h-[300px] w-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)]"
+            className="pointer-events-none absolute -bottom-12 right-2 max-h-[260px] w-auto object-contain opacity-90 drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)]"
           />
         </div>
         <Card className="max-w-md lg:max-w-none">

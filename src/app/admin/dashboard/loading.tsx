@@ -1,25 +1,23 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminDashboardLoading() {
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Painel"
-        description="Carregando indicadores."
-      />
+      <section className="rounded-lg border border-lindao-gold/30 bg-white/5 p-5">
+        <Skeleton className="h-4 w-48" />
+        <Skeleton className="mt-4 h-10 w-72 max-w-full" />
+        <Skeleton className="mt-3 h-4 w-96 max-w-full" />
+      </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
-            className="rounded-lg border border-white/10 bg-white/5 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.2)]"
+            className="rounded-lg border border-white/10 bg-white/5 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.2)]"
           >
             <Skeleton className="h-3 w-32" />
             <Skeleton className="mt-4 h-10 w-24" />
-            <Skeleton className="mt-4 h-4 w-full" />
           </div>
         ))}
       </section>

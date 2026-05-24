@@ -8,10 +8,10 @@ type PageHeaderProps = {
 
 export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
   return (
-    <header className="space-y-4">
+    <header className="space-y-3">
       {eyebrow ? <Badge>{eyebrow}</Badge> : null}
       <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">
+        <h1 className="text-2xl font-black tracking-normal text-white sm:text-3xl">
           {title}
         </h1>
         {description ? (

@@ -235,7 +235,7 @@ export default async function AdminRankingPage({
                   {ranking.map((customer) => (
                     <tr
                       key={customer.customer_id}
-                      className="border-b border-lindao-line last:border-0"
+                      className="border-b border-lindao-line transition hover:bg-white/[0.04] last:border-0"
                     >
                       <td className="py-4 pr-4">
                         <span className="flex size-10 items-center justify-center rounded-md bg-lindao-blue text-sm font-black text-white">

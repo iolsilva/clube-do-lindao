@@ -1,51 +1,141 @@
+import Image from "next/image";
+import { CircleDollarSign, Hammer, ReceiptText, Users } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { Brand } from "@/components/layout/brand";
+import { MobileAdminMenu } from "@/components/layout/mobile-admin-menu";
 import { NavLink } from "@/components/layout/nav-link";
 import { adminNavigation } from "@/lib/navigation";
+import { formatPoints } from "@/lib/formatters";
+import { createClient } from "@/lib/supabase/server";
 
 type AdminShellProps = {
   children: React.ReactNode;
 };
 
-export function AdminShell({ children }: AdminShellProps) {
+type HeaderMetric = {
+  label: string;
+  value: string;
+};
+
+async function getHeaderMetrics(): Promise<HeaderMetric[]> {
+  const supabase = await createClient();
+  const [customersResult, purchasesResult, pointsResult] = await Promise.all([
+    supabase.from("customers").select("id", { count: "exact", head: true }),
+    supabase.from("purchases").select("id", { count: "exact", head: true }),
+    supabase.from("customer_points_view").select("total_points"),
+  ]);
+
+  const totalPoints = (pointsResult.data ?? []).reduce(
+    (sum, row) => sum + Number(row.total_points),
+    0,
+  );
+
+  return [
+    { label: "Clientes", value: String(customersResult.count ?? 0) },
+    { label: "Pontos", value: formatPoints(totalPoints) },
+    { label: "Vendas", value: String(purchasesResult.count ?? 0) },
+  ];
+}
+
+const metricIcons = [Users, CircleDollarSign, ReceiptText];
+
+export async function AdminShell({ children }: AdminShellProps) {
+  const metrics = await getHeaderMetrics();
+
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-white/10 bg-lindao-dark/90 px-4 py-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)] backdrop-blur lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
-          <Brand href="/admin/dashboard" />
-          <div className="mt-6 rounded-lg border border-lindao-gold/35 bg-lindao-gold/10 p-3">
-            <p className="text-xs font-black uppercase tracking-wide text-lindao-gold">
-              Programa de Fidelidade Oficial
-            </p>
-            <p className="mt-1 text-xs leading-5 text-slate-300">
-              Comprou, pontuou, ganhou.
-            </p>
+      <header className="relative overflow-hidden border-b border-lindao-gold/45 bg-[radial-gradient(circle_at_8%_0%,rgba(245,197,24,0.22),transparent_18rem),radial-gradient(circle_at_78%_10%,rgba(37,99,235,0.4),transparent_20rem),linear-gradient(135deg,#1843b8_0%,#12328d_48%,#07143e_100%)] shadow-[0_26px_90px_rgba(0,0,0,0.34)]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:42px_42px]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-28 size-72 rounded-full border border-lindao-gold/25 bg-lindao-gold/10"
+        />
+        <div className="relative z-[1] mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(220px,0.75fr)_minmax(330px,0.9fr)] lg:items-center lg:px-8">
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-transparent drop-shadow-[0_16px_34px_rgba(0,0,0,0.28)]">
+              <Image
+                src="/images/logo.PNG"
+                alt="Clube do Lindao"
+                fill
+                priority
+                sizes="64px"
+                className="object-contain"
+              />
+            </span>
+            <div className="min-w-0">
+              <p className="text-2xl font-black uppercase leading-tight text-white sm:text-3xl">
+                CLUBE DO LINDÃO
+              </p>
+              <p className="mt-1 text-xs font-black uppercase tracking-wide text-lindao-gold sm:text-sm">
+                DEPÓSITO SÃO MARCOS · MATERIAL PARA CONSTRUÇÃO
+              </p>
+            </div>
           </div>
-          <nav className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:grid lg:overflow-visible lg:pb-0">
+
+          <div className="rounded-lg border border-lindao-gold/30 bg-lindao-dark/20 px-4 py-3 text-left shadow-[0_18px_48px_rgba(0,0,0,0.2)] lg:text-center">
+            <div className="flex items-center gap-2 lg:justify-center">
+              <Hammer
+                aria-hidden="true"
+                className="size-4 text-lindao-gold"
+                strokeWidth={2.5}
+              />
+              <p className="text-sm font-black text-white">
+                Comprou, pontuou, ganhou.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {metrics.map((metric, index) => {
+              const Icon = metricIcons[index];
+
+              return (
+                <div
+                  key={metric.label}
+                  className="rounded-lg border border-white/10 bg-white/10 p-3 shadow-[0_16px_42px_rgba(0,0,0,0.18)] backdrop-blur"
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon
+                      aria-hidden="true"
+                      className="size-4 shrink-0 text-lindao-gold"
+                      strokeWidth={2.4}
+                    />
+                    <p className="truncate text-[11px] font-black uppercase tracking-wide text-slate-200">
+                      {metric.label}
+                    </p>
+                  </div>
+                  <p className="mt-2 truncate text-lg font-black text-white">
+                    {metric.value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </header>
+
+      <div className="sticky top-0 z-20 border-b border-lindao-gold/25 bg-lindao-dark/95 shadow-[0_18px_54px_rgba(0,0,0,0.28)] backdrop-blur">
+        <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+          <nav className="hidden items-center gap-2 lg:flex">
             {adminNavigation.map((item) => (
-              <NavLink key={item.href} href={item.href} label={item.label} />
+              <NavLink
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+              />
             ))}
           </nav>
-        </aside>
-        <div className="flex min-w-0 flex-col">
-          <header className="sticky top-0 z-10 border-b border-white/10 bg-[#1843b8]/90 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-wide text-lindao-gold">
-                  Programa de Fidelidade Oficial
-                </p>
-                <p className="mt-1 text-sm font-black text-white">
-                  Comprou, pontuou, ganhou.
-                </p>
-              </div>
-              <LogoutButton />
-            </div>
-          </header>
-          <main className="flex w-full flex-1 flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-            {children}
-          </main>
+          <MobileAdminMenu />
+          <LogoutButton />
         </div>
       </div>
+
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        {children}
+      </main>
     </div>
   );
 }

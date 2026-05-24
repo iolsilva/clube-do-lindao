@@ -35,7 +35,7 @@ export default async function PremiosPage() {
         description="Veja os premios ativos disponiveis para troca no Clube do Lindao."
       />
 
-      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_82%_20%,rgba(245,197,24,0.18),transparent_17rem),linear-gradient(135deg,rgba(6,15,46,0.96),rgba(24,67,184,0.86))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.32)] sm:p-8">
+      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/30 bg-[radial-gradient(circle_at_82%_20%,rgba(245,197,24,0.18),transparent_17rem),linear-gradient(135deg,rgba(6,15,46,0.96),rgba(24,67,184,0.86))] p-5 shadow-[0_24px_74px_rgba(0,0,0,0.3)] sm:p-7">
         <div className="relative z-[1] max-w-2xl space-y-3">
           <Badge>Premios oficiais</Badge>
           <h2 className="text-3xl font-black text-white sm:text-5xl">
@@ -52,7 +52,7 @@ export default async function PremiosPage() {
           width={300}
           height={360}
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 right-3 hidden max-h-[250px] w-auto object-contain drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)] md:block"
+          className="pointer-events-none absolute -bottom-10 right-4 hidden max-h-[230px] w-auto object-contain opacity-90 drop-shadow-[0_24px_36px_rgba(0,0,0,0.34)] lg:block"
         />
       </section>
 
