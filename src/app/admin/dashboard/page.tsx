@@ -164,11 +164,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <PageHeader
-        eyebrow="Admin"
-        title="Painel"
-        description="Indicadores do Clube do Lindao."
-      />
+      <PageHeader eyebrow="Admin" title="Painel" />
 
       {loadError ? (
         <Alert variant="error" title="Nao foi possivel atualizar o painel">
@@ -176,20 +172,20 @@ export default async function AdminDashboardPage() {
         </Alert>
       ) : null}
 
-      <section className="relative min-h-64 overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_78%_18%,rgba(245,197,24,0.2),transparent_18rem),linear-gradient(135deg,rgba(24,67,184,0.88),rgba(6,15,46,0.96))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-8">
-        <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[46%] overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(245,197,24,0.18),transparent_17rem)] md:block">
-          <div className="absolute inset-y-0 left-0 z-[1] w-28 bg-gradient-to-r from-lindao-blue/80 via-lindao-blue/20 to-transparent" />
+      <section className="relative min-h-[220px] overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_82%_20%,rgba(245,197,24,0.22),transparent_15rem),radial-gradient(circle_at_16%_0%,rgba(37,99,235,0.42),transparent_18rem),linear-gradient(135deg,#1843b8_0%,#10275f_48%,#060f2e_100%)] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-7 md:min-h-[245px]">
+        <div className="pointer-events-none absolute bottom-0 right-3 hidden h-[240px] w-[255px] md:block lg:right-6 lg:h-[276px] lg:w-[300px]">
+          <div className="absolute bottom-0 right-4 h-28 w-40 rounded-full bg-lindao-gold/18 blur-2xl" />
           <Image
             src="/images/boneco3.PNG"
             alt=""
-            fill
+            width={300}
+            height={360}
             priority
-            sizes="(min-width: 1024px) 420px, 46vw"
             aria-hidden="true"
-            className="object-contain object-right-bottom opacity-95 mix-blend-multiply drop-shadow-[0_24px_40px_rgba(0,0,0,0.32)]"
+            className="relative z-[1] h-full w-full object-contain object-bottom drop-shadow-[0_24px_38px_rgba(0,0,0,0.34)]"
           />
         </div>
-        <div className="relative z-[2] max-w-2xl space-y-5 md:max-w-[60%]">
+        <div className="relative z-[2] max-w-xl space-y-4 pr-0 md:max-w-[62%]">
           <div className="flex flex-wrap items-center gap-3">
             <Image
               src="/images/logo.PNG"
@@ -197,7 +193,7 @@ export default async function AdminDashboardPage() {
               width={72}
               height={72}
               priority
-              className="object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
+              className="h-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
             />
             <Badge>Programa de Fidelidade Oficial</Badge>
           </div>
@@ -205,9 +201,9 @@ export default async function AdminDashboardPage() {
             <h2 className="text-3xl font-black text-white sm:text-5xl">
               Comprou, pontuou, ganhou.
             </h2>
-            <p className="mt-3 max-w-xl text-base leading-7 text-slate-200">
-              Painel administrativo do Clube do Lindao para acompanhar clientes,
-              compras, pontos e premios do Deposito Sao Marcos.
+            <p className="mt-3 max-w-lg text-base leading-7 text-slate-200">
+              Acompanhe clientes, compras, pontos e premios do Deposito Sao
+              Marcos.
             </p>
           </div>
         </div>
