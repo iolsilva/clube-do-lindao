@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <section
       className={cn(
-        "rounded-lg border border-lindao-line bg-white shadow-sm",
+        "rounded-lg border border-lindao-line/80 bg-white shadow-[0_18px_50px_rgba(12,36,72,0.07)]",
         className,
       )}
     >
@@ -20,7 +20,12 @@ export function Card({ children, className }: CardProps) {
 
 export function CardHeader({ children, className }: CardProps) {
   return (
-    <div className={cn("border-b border-lindao-line p-5", className)}>
+    <div
+      className={cn(
+        "border-b border-lindao-line/80 bg-slate-50/60 p-5",
+        className,
+      )}
+    >
       {children}
     </div>
   );

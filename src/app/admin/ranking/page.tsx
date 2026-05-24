@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -117,10 +118,10 @@ export default async function AdminRankingPage({
       />
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar o ranking">
           Nao foi possivel carregar o ranking. Confira se as views do Supabase
           foram atualizadas.
-        </div>
+        </Alert>
       ) : null}
 
       <section className="grid gap-4 md:grid-cols-3">

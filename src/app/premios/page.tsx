@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/layout/public-shell";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -34,9 +35,9 @@ export default async function PremiosPage() {
       />
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar os premios">
           Nao foi possivel carregar os premios agora.
-        </div>
+        </Alert>
       ) : rewards.length === 0 ? (
         <EmptyState
           eyebrow="Sem premios"

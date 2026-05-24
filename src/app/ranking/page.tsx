@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/layout/public-shell";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -54,10 +55,10 @@ export default async function RankingPage() {
       />
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar o ranking">
           Nao foi possivel carregar o ranking agora. Confira se a view publica
           foi aplicada no Supabase.
-        </div>
+        </Alert>
       ) : ranking.length === 0 ? (
         <EmptyState
           eyebrow="Sem pontuacao"

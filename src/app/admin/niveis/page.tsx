@@ -1,5 +1,6 @@
 import { deleteLevelAction } from "@/app/admin/niveis/actions";
 import { LevelForm } from "@/components/levels/level-form";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -80,25 +81,24 @@ export default async function AdminNiveisPage({
       />
 
       {statusMessage ? (
-        <p
-          className={cn(
-            "rounded-md border px-4 py-3 text-sm font-semibold",
+        <Alert
+          variant={
             params.status?.includes("error") ||
               params.status === "invalid" ||
               params.status === "in-use"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700",
-          )}
+              ? "error"
+              : "success"
+          }
         >
           {statusMessage}
-        </p>
+        </Alert>
       ) : null}
 
       {loadError ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar os niveis">
           Nao foi possivel carregar os niveis. Confira as permissoes do usuario
           admin no Supabase.
-        </div>
+        </Alert>
       ) : null}
 
       <Card>

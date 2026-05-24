@@ -1,5 +1,6 @@
 import { toggleRewardStatusAction } from "@/app/admin/premios/actions";
 import { RewardForm } from "@/components/rewards/reward-form";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -61,23 +62,22 @@ export default async function AdminPremiosPage({
       />
 
       {statusMessage ? (
-        <p
-          className={cn(
-            "rounded-md border px-4 py-3 text-sm font-semibold",
+        <Alert
+          variant={
             params.status?.includes("error") || params.status === "invalid"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700",
-          )}
+              ? "error"
+              : "success"
+          }
         >
           {statusMessage}
-        </p>
+        </Alert>
       ) : null}
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar os premios">
           Nao foi possivel carregar os premios. Confira as permissoes do
           usuario admin no Supabase.
-        </div>
+        </Alert>
       ) : null}
 
       <section className="grid gap-4 md:grid-cols-3">

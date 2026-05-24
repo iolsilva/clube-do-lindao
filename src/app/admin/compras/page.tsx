@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PurchaseForm } from "@/components/purchases/purchase-form";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -148,16 +149,14 @@ export default async function AdminComprasPage({
       />
 
       {statusMessage ? (
-        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-          {statusMessage}
-        </p>
+        <Alert variant="success">{statusMessage}</Alert>
       ) : null}
 
       {loadError ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700">
+        <Alert variant="error" title="Nao foi possivel carregar as compras">
           Nao foi possivel carregar os dados de compras. Confira se o schema do
           Supabase esta atualizado e se o usuario possui perfil admin.
-        </div>
+        </Alert>
       ) : null}
 
       <Card>
