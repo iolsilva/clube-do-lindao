@@ -69,11 +69,14 @@ create table if not exists public.rewards (
 create table if not exists public.reward_redemptions (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid not null references public.customers(id) on delete cascade,
-  reward_id uuid not null references public.rewards(id) on delete restrict,
+  reward_id uuid references public.rewards(id) on delete restrict,
+  points_used numeric(12, 2) not null check (points_used >= 0),
   points_spent numeric(12, 2) not null check (points_spent >= 0),
-  status text not null default 'pending' check (
-    status in ('pending', 'approved', 'delivered', 'cancelled')
+  status text not null default 'completed' check (
+    status in ('completed', 'pending', 'approved', 'delivered', 'cancelled')
   ),
+  redemption_date timestamptz not null default now(),
+  notes text,
   redeemed_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -228,15 +231,17 @@ with (security_invoker = true) as
 with purchase_totals as (
   select
     customer_id,
+    count(id)::integer as total_purchases,
     coalesce(sum(amount_cents), 0)::integer as total_purchase_amount_cents,
-    coalesce(sum(points), 0)::numeric(12, 2) as total_points
+    (coalesce(sum(amount_cents), 0)::numeric / 100)::numeric(12, 2) as total_spent,
+    coalesce(sum(points), 0)::numeric(12, 2) as earned_points
   from public.purchases
   group by customer_id
 ),
 redemption_totals as (
   select
     customer_id,
-    coalesce(sum(points_spent), 0)::numeric(12, 2) as redeemed_points
+    coalesce(sum(coalesce(points_used, points_spent)), 0)::numeric(12, 2) as total_redeemed
   from public.reward_redemptions
   where status <> 'cancelled'
   group by customer_id
@@ -244,20 +249,24 @@ redemption_totals as (
 ranking_source as (
   select
     customers.id as customer_id,
-    customers.code as customer_code,
+    customers.name as full_name,
     customers.name as customer_name,
+    customers.code as customer_code,
     customers.document_type,
     customers.document,
     customers.phone,
     customers.email,
+    customers.active as is_active,
     customers.active,
     levels.id as level_id,
     levels.name as level_name,
+    coalesce(purchase_totals.total_purchases, 0) as total_purchases,
     coalesce(purchase_totals.total_purchase_amount_cents, 0) as total_purchase_amount_cents,
-    coalesce(purchase_totals.total_points, 0)::numeric(12, 2) as total_points,
-    coalesce(redemption_totals.redeemed_points, 0)::numeric(12, 2) as redeemed_points,
+    coalesce(purchase_totals.total_spent, 0)::numeric(12, 2) as total_spent,
+    coalesce(purchase_totals.earned_points, 0)::numeric(12, 2) as earned_points,
+    coalesce(redemption_totals.total_redeemed, 0)::numeric(12, 2) as total_redeemed,
     greatest(
-      coalesce(purchase_totals.total_points, 0) - coalesce(redemption_totals.redeemed_points, 0),
+      coalesce(purchase_totals.earned_points, 0) - coalesce(redemption_totals.total_redeemed, 0),
       0
     )::numeric(12, 2) as available_points
   from public.customers
@@ -266,22 +275,34 @@ ranking_source as (
   left join redemption_totals on redemption_totals.customer_id = customers.id
 )
 select
-  dense_rank() over (order by total_points desc) as ranking_position,
+  dense_rank() over (order by available_points desc) as ranking_position,
   customer_id,
-  customer_code,
+  full_name,
   customer_name,
+  customer_code,
   document_type,
   document,
   phone,
   email,
+  is_active,
   active,
   level_id,
   level_name,
-  total_purchase_amount_cents,
   total_points,
-  redeemed_points,
+  earned_points,
+  earned_points as accumulated_points,
+  total_spent,
+  total_purchase_amount_cents,
+  total_purchases,
+  total_redeemed,
+  total_redeemed as redeemed_points,
   available_points
-from ranking_source;
+from (
+  select
+    ranking_source.*,
+    available_points as total_points
+  from ranking_source
+) as ranked_source;
 
 drop view if exists public.public_ranking_view;
 

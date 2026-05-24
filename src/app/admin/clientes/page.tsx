@@ -6,13 +6,19 @@ import {
   type CustomerFormCustomer,
   type LevelOption,
 } from "@/components/customers/customer-form";
+import { CustomerRedemptionDialog } from "@/components/customers/customer-redemption-dialog";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { formatDocument, formatPhone, onlyDigits } from "@/lib/formatters";
+import {
+  formatDocument,
+  formatPhone,
+  formatPoints,
+  onlyDigits,
+} from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 
@@ -33,6 +39,12 @@ type CustomerRow = {
   level_id: string | null;
   active: boolean;
   levels: { name: string } | Array<{ name: string }> | null;
+};
+
+type CustomerPointsRow = {
+  available_points: string | number | null;
+  customer_id: string;
+  total_points: string | number | null;
 };
 
 function buildSearchFilter(search: string) {
@@ -70,6 +82,7 @@ function getStatusMessage(status?: string) {
     created: "Cliente cadastrado com sucesso.",
     deactivated: "Cliente inativado com sucesso.",
     invalid: "Cliente inválido.",
+    redeemed: "Resgate registrado com sucesso.",
     "status-error": "Não foi possível alterar o status do cliente.",
     updated: "Cliente atualizado com sucesso.",
   };
@@ -88,6 +101,13 @@ function toFormCustomer(customer: CustomerRow): CustomerFormCustomer {
     levelId: customer.level_id,
     active: customer.active,
   };
+}
+
+function getAvailablePoints(points?: CustomerPointsRow) {
+  return Math.max(
+    Number(points?.available_points ?? points?.total_points ?? 0),
+    0,
+  );
 }
 
 export default async function AdminClientesPage({
@@ -120,12 +140,26 @@ export default async function AdminClientesPage({
   const [
     { data: levelsData, error: levelsError },
     { data: customersData, error: customersError },
-  ] = await Promise.all([levelsQuery, customersQuery]);
+    { data: pointsData, error: pointsError },
+  ] = await Promise.all([
+    levelsQuery,
+    customersQuery,
+    supabase
+      .from("customer_points_view")
+      .select("customer_id, available_points, total_points"),
+  ]);
 
   const levels = (levelsData ?? []) as LevelOption[];
   const customers = (customersData ?? []) as CustomerRow[];
+  const pointsByCustomer = new Map(
+    ((pointsData ?? []) as CustomerPointsRow[]).map((row) => [
+      row.customer_id,
+      row,
+    ]),
+  );
   const statusMessage = getStatusMessage(params.status);
-  const loadError = customersError?.message ?? levelsError?.message;
+  const loadError =
+    customersError?.message ?? levelsError?.message ?? pointsError?.message;
 
   return (
     <>
@@ -238,105 +272,126 @@ export default async function AdminClientesPage({
               </div>
             ) : (
               <div className="divide-y divide-white/10">
-                <div className="hidden grid-cols-[minmax(170px,1.35fr)_minmax(120px,0.9fr)_minmax(112px,0.85fr)_minmax(112px,0.8fr)_110px] gap-3 bg-white/[0.035] px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 lg:grid">
+                <div className="hidden grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px_150px] gap-3 bg-white/[0.035] px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 lg:grid">
                   <span>Cliente</span>
                   <span>Documento</span>
                   <span>Telefone</span>
                   <span>Nível</span>
-                  <span className="text-right">Status</span>
+                  <span className="text-right">Pontos</span>
+                  <span className="text-right">Ações</span>
                 </div>
 
-                {customers.map((customer) => (
-                  <article
-                    key={customer.id}
-                    className="px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
-                  >
-                    <div className="grid gap-3 lg:grid-cols-[minmax(170px,1.35fr)_minmax(120px,0.9fr)_minmax(112px,0.85fr)_minmax(112px,0.8fr)_110px] lg:items-center">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="px-2.5 py-0.5">
-                            {customer.code ?? "Sem código"}
-                          </Badge>
-                          <span
-                            className={cn(
-                              "rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.14em]",
-                              customer.active
-                                ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-300"
-                                : "border-slate-400/20 bg-white/5 text-slate-300",
-                            )}
-                          >
-                            {customer.active ? "Ativo" : "Inativo"}
-                          </span>
+                {customers.map((customer) => {
+                  const availablePoints = getAvailablePoints(
+                    pointsByCustomer.get(customer.id),
+                  );
+
+                  return (
+                    <article
+                      key={customer.id}
+                      className="px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
+                    >
+                      <div className="grid gap-3 lg:grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px_150px] lg:items-center">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge className="px-2.5 py-0.5">
+                              {customer.code ?? "Sem código"}
+                            </Badge>
+                            <span
+                              className={cn(
+                                "rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.14em]",
+                                customer.active
+                                  ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-300"
+                                  : "border-slate-400/20 bg-white/5 text-slate-300",
+                              )}
+                            >
+                              {customer.active ? "Ativo" : "Inativo"}
+                            </span>
+                          </div>
+                          <h3 className="mt-2 truncate text-sm font-black text-white">
+                            {customer.name}
+                          </h3>
                         </div>
-                        <h3 className="mt-2 truncate text-sm font-black text-white">
-                          {customer.name}
-                        </h3>
+
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                            Documento
+                          </p>
+                          <p className="truncate text-sm font-semibold text-slate-200">
+                            {formatDocument(
+                              customer.document,
+                              customer.document_type,
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                            Telefone
+                          </p>
+                          <p className="truncate text-sm font-semibold text-slate-200">
+                            {formatPhone(customer.phone)}
+                          </p>
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                            Nível
+                          </p>
+                          <p className="truncate text-sm font-semibold text-slate-200">
+                            {getLevelName(customer.levels)}
+                          </p>
+                        </div>
+
+                        <div className="min-w-0 lg:text-right">
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
+                            Pontos
+                          </p>
+                          <p className="text-sm font-black text-lindao-gold">
+                            {formatPoints(availablePoints)}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 lg:justify-end">
+                          <CustomerRedemptionDialog
+                            availablePoints={availablePoints}
+                            customerCode={customer.code}
+                            customerId={customer.id}
+                            customerName={customer.name}
+                          />
+                          <form action={toggleCustomerStatusAction}>
+                            <input type="hidden" name="id" value={customer.id} />
+                            <input
+                              type="hidden"
+                              name="active"
+                              value={String(customer.active)}
+                            />
+                            <Button
+                              type="submit"
+                              variant={customer.active ? "secondary" : "primary"}
+                              className="h-8 px-3 text-xs"
+                            >
+                              {customer.active ? "Inativar" : "Ativar"}
+                            </Button>
+                          </form>
+                        </div>
                       </div>
 
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
-                          Documento
-                        </p>
-                        <p className="truncate text-sm font-semibold text-slate-200">
-                          {formatDocument(
-                            customer.document,
-                            customer.document_type,
-                          )}
-                        </p>
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
-                          Telefone
-                        </p>
-                        <p className="truncate text-sm font-semibold text-slate-200">
-                          {formatPhone(customer.phone)}
-                        </p>
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 lg:hidden">
-                          Nível
-                        </p>
-                        <p className="truncate text-sm font-semibold text-slate-200">
-                          {getLevelName(customer.levels)}
-                        </p>
-                      </div>
-
-                      <form
-                        action={toggleCustomerStatusAction}
-                        className="flex lg:justify-end"
-                      >
-                        <input type="hidden" name="id" value={customer.id} />
-                        <input
-                          type="hidden"
-                          name="active"
-                          value={String(customer.active)}
-                        />
-                        <Button
-                          type="submit"
-                          variant={customer.active ? "secondary" : "primary"}
-                          className="h-8 px-3 text-xs"
-                        >
-                          {customer.active ? "Inativar" : "Ativar"}
-                        </Button>
-                      </form>
-                    </div>
-
-                    <details className="mt-3">
-                      <summary className="inline-flex h-8 cursor-pointer list-none items-center rounded-md border border-lindao-gold/30 px-3 text-xs font-black text-lindao-gold transition duration-200 hover:-translate-y-0.5 hover:bg-lindao-gold/10">
-                        Editar cliente
-                      </summary>
-                      <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.035] p-4">
-                        <CustomerForm
-                          mode="edit"
-                          levels={levels}
-                          customer={toFormCustomer(customer)}
-                        />
-                      </div>
-                    </details>
-                  </article>
-                ))}
+                      <details className="mt-3">
+                        <summary className="inline-flex h-8 cursor-pointer list-none items-center rounded-md border border-lindao-gold/30 px-3 text-xs font-black text-lindao-gold transition duration-200 hover:-translate-y-0.5 hover:bg-lindao-gold/10">
+                          Editar cliente
+                        </summary>
+                        <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.035] p-4">
+                          <CustomerForm
+                            mode="edit"
+                            levels={levels}
+                            customer={toFormCustomer(customer)}
+                          />
+                        </div>
+                      </details>
+                    </article>
+                  );
+                })}
               </div>
             )}
           </CardContent>
