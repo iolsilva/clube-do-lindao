@@ -62,8 +62,10 @@ function getCustomerFromPurchase(customer: PurchaseRow["customers"]) {
 function MetricCard({ detail, label, tone, value }: MetricCardProps) {
   return (
     <div
+      tabIndex={0}
+      aria-label={`${label}. ${detail}`}
       className={cn(
-        "rounded-lg border p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-lindao-gold/45",
+        "group relative rounded-lg border p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-lindao-gold/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lindao-gold",
         metricTones[tone],
       )}
     >
@@ -73,7 +75,9 @@ function MetricCard({ detail, label, tone, value }: MetricCardProps) {
       <p className="mt-3 text-3xl font-black text-white sm:text-4xl">
         {value}
       </p>
-      <p className="mt-2 text-sm leading-6 text-slate-300">{detail}</p>
+      <span className="pointer-events-none absolute left-4 right-4 top-full z-20 mt-3 hidden translate-y-1 rounded-md border border-lindao-gold/40 bg-lindao-navy px-3 py-2 text-xs font-semibold leading-5 text-white opacity-0 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:block">
+        {detail}
+      </span>
     </div>
   );
 }
@@ -172,8 +176,20 @@ export default async function AdminDashboardPage() {
         </Alert>
       ) : null}
 
-      <section className="relative overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_78%_18%,rgba(245,197,24,0.2),transparent_18rem),linear-gradient(135deg,rgba(24,67,184,0.88),rgba(6,15,46,0.96))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-8">
-        <div className="relative z-[1] max-w-2xl space-y-5">
+      <section className="relative min-h-64 overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_78%_18%,rgba(245,197,24,0.2),transparent_18rem),linear-gradient(135deg,rgba(24,67,184,0.88),rgba(6,15,46,0.96))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-8">
+        <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[46%] overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(245,197,24,0.18),transparent_17rem)] md:block">
+          <div className="absolute inset-y-0 left-0 z-[1] w-28 bg-gradient-to-r from-lindao-blue/80 via-lindao-blue/20 to-transparent" />
+          <Image
+            src="/images/boneco3.PNG"
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 1024px) 420px, 46vw"
+            aria-hidden="true"
+            className="object-contain object-right-bottom opacity-95 mix-blend-multiply drop-shadow-[0_24px_40px_rgba(0,0,0,0.32)]"
+          />
+        </div>
+        <div className="relative z-[2] max-w-2xl space-y-5 md:max-w-[60%]">
           <div className="flex flex-wrap items-center gap-3">
             <Image
               src="/images/logo.PNG"
@@ -195,15 +211,6 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
         </div>
-        <Image
-          src="/images/boneco1.PNG"
-          alt=""
-          width={360}
-          height={420}
-          priority
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 right-4 hidden max-h-[310px] w-auto object-contain drop-shadow-[0_24px_40px_rgba(0,0,0,0.32)] md:block"
-        />
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -216,7 +223,7 @@ export default async function AdminDashboardPage() {
         <MetricCard
           label="Clientes ativos"
           value={String(activeCustomersResult.count ?? 0)}
-          detail="Aptos a aparecer no ranking publico."
+          detail="Clientes aptos a aparecer no ranking publico."
           tone="green"
         />
         <MetricCard
