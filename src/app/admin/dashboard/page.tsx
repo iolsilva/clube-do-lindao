@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
+  Banknote,
   CircleDollarSign,
-  ReceiptText,
   UserCheck,
   Users,
   type LucideIcon,
@@ -132,8 +132,7 @@ export default async function AdminDashboardPage() {
   const [
     totalCustomersResult,
     activeCustomersResult,
-    purchasesCountResult,
-    pointsResult,
+    totalsResult,
     rankingResult,
     latestPurchasesResult,
   ] = await Promise.all([
@@ -142,8 +141,9 @@ export default async function AdminDashboardPage() {
       .from("customers")
       .select("id", { count: "exact", head: true })
       .eq("active", true),
-    supabase.from("purchases").select("id", { count: "exact", head: true }),
-    supabase.from("customer_points_view").select("total_points"),
+    supabase
+      .from("customer_points_view")
+      .select("total_points, total_purchase_amount_cents"),
     supabase
       .from("customer_points_view")
       .select(
@@ -159,20 +159,24 @@ export default async function AdminDashboardPage() {
       .limit(6),
   ]);
 
-  const pointsRows = (pointsResult.data ?? []) as Array<{
+  const totalsRows = (totalsResult.data ?? []) as Array<{
     total_points: string | number;
+    total_purchase_amount_cents: string | number;
   }>;
   const topRanking = (rankingResult.data ?? []) as RankingRow[];
   const latestPurchases = (latestPurchasesResult.data ?? []) as PurchaseRow[];
-  const totalPoints = pointsRows.reduce(
+  const totalPoints = totalsRows.reduce(
     (sum, row) => sum + Number(row.total_points),
+    0,
+  );
+  const totalSalesCents = totalsRows.reduce(
+    (sum, row) => sum + Number(row.total_purchase_amount_cents),
     0,
   );
   const loadError =
     totalCustomersResult.error?.message ??
     activeCustomersResult.error?.message ??
-    purchasesCountResult.error?.message ??
-    pointsResult.error?.message ??
+    totalsResult.error?.message ??
     rankingResult.error?.message ??
     latestPurchasesResult.error?.message;
 
@@ -248,10 +252,10 @@ export default async function AdminDashboardPage() {
           tone="green"
         />
         <MetricCard
-          icon={ReceiptText}
-          label="Total de compras"
-          value={String(purchasesCountResult.count ?? 0)}
-          detail="Historico de compras registradas."
+          icon={Banknote}
+          label="Total vendido"
+          value={formatCurrencyFromCents(totalSalesCents)}
+          detail="Valor total movimentado pelas compras registradas."
           tone="blue"
         />
         <MetricCard

@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { CircleDollarSign, Hammer, ReceiptText, Users } from "lucide-react";
+import { Banknote, CircleDollarSign, Hammer, Users } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { MobileAdminMenu } from "@/components/layout/mobile-admin-menu";
 import { NavLink } from "@/components/layout/nav-link";
 import { adminNavigation } from "@/lib/navigation";
-import { formatPoints } from "@/lib/formatters";
+import { formatCurrencyFromCents, formatPoints } from "@/lib/formatters";
 import { createClient } from "@/lib/supabase/server";
 
 type AdminShellProps = {
@@ -12,31 +12,53 @@ type AdminShellProps = {
 };
 
 type HeaderMetric = {
+  detail: string;
   label: string;
   value: string;
 };
 
 async function getHeaderMetrics(): Promise<HeaderMetric[]> {
   const supabase = await createClient();
-  const [customersResult, purchasesResult, pointsResult] = await Promise.all([
+  const [customersResult, totalsResult] = await Promise.all([
     supabase.from("customers").select("id", { count: "exact", head: true }),
-    supabase.from("purchases").select("id", { count: "exact", head: true }),
-    supabase.from("customer_points_view").select("total_points"),
+    supabase
+      .from("customer_points_view")
+      .select("total_points, total_purchase_amount_cents"),
   ]);
 
-  const totalPoints = (pointsResult.data ?? []).reduce(
+  const totalRows = (totalsResult.data ?? []) as Array<{
+    total_points: string | number;
+    total_purchase_amount_cents: string | number;
+  }>;
+  const totalPoints = totalRows.reduce(
     (sum, row) => sum + Number(row.total_points),
+    0,
+  );
+  const totalSalesCents = totalRows.reduce(
+    (sum, row) => sum + Number(row.total_purchase_amount_cents),
     0,
   );
 
   return [
-    { label: "Clientes", value: String(customersResult.count ?? 0) },
-    { label: "Pontos", value: formatPoints(totalPoints) },
-    { label: "Vendas", value: String(purchasesResult.count ?? 0) },
+    {
+      detail: "Clientes cadastrados no clube.",
+      label: "Clientes",
+      value: String(customersResult.count ?? 0),
+    },
+    {
+      detail: "Pontos acumulados pelas compras registradas.",
+      label: "Pontos",
+      value: formatPoints(totalPoints),
+    },
+    {
+      detail: "Valor total movimentado pelas compras registradas.",
+      label: "Total vendido",
+      value: formatCurrencyFromCents(totalSalesCents),
+    },
   ];
 }
 
-const metricIcons = [Users, CircleDollarSign, ReceiptText];
+const metricIcons = [Users, CircleDollarSign, Banknote];
 
 export async function AdminShell({ children }: AdminShellProps) {
   const metrics = await getHeaderMetrics();
@@ -94,6 +116,8 @@ export async function AdminShell({ children }: AdminShellProps) {
               return (
                 <div
                   key={metric.label}
+                  aria-label={`${metric.label}. ${metric.detail}`}
+                  title={metric.detail}
                   className="rounded-lg border border-white/10 bg-white/10 p-3 shadow-[0_16px_42px_rgba(0,0,0,0.18)] backdrop-blur"
                 >
                   <div className="flex items-center gap-2">
