@@ -172,20 +172,28 @@ export default async function AdminDashboardPage() {
         </Alert>
       ) : null}
 
-      <section className="relative min-h-[220px] overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_82%_20%,rgba(245,197,24,0.22),transparent_15rem),radial-gradient(circle_at_16%_0%,rgba(37,99,235,0.42),transparent_18rem),linear-gradient(135deg,#1843b8_0%,#10275f_48%,#060f2e_100%)] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-7 md:min-h-[245px]">
-        <div className="pointer-events-none absolute bottom-0 right-3 hidden h-[240px] w-[255px] md:block lg:right-6 lg:h-[276px] lg:w-[300px]">
-          <div className="absolute bottom-0 right-4 h-28 w-40 rounded-full bg-lindao-gold/18 blur-2xl" />
-          <Image
-            src="/images/boneco3.PNG"
-            alt=""
-            width={300}
-            height={360}
-            priority
-            aria-hidden="true"
-            className="relative z-[1] h-full w-full object-contain object-bottom drop-shadow-[0_24px_38px_rgba(0,0,0,0.34)]"
-          />
-        </div>
-        <div className="relative z-[2] max-w-xl space-y-4 pr-0 md:max-w-[62%]">
+      <section className="relative min-h-[210px] overflow-hidden rounded-lg border border-lindao-gold/35 bg-[radial-gradient(circle_at_82%_18%,rgba(245,197,24,0.2),transparent_14rem),radial-gradient(circle_at_14%_0%,rgba(37,99,235,0.44),transparent_18rem),linear-gradient(135deg,#1843b8_0%,#10275f_48%,#060f2e_100%)] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.34)] sm:p-7">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:38px_38px]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-24 size-56 rounded-full border border-lindao-gold/30 bg-lindao-gold/10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-5 right-8 hidden size-28 rounded-full border border-white/15 bg-lindao-blue/20 shadow-[0_0_70px_rgba(245,197,24,0.24)] sm:block"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-10 right-24 hidden size-4 rounded-full bg-lindao-gold shadow-[0_0_26px_rgba(245,197,24,0.7)] md:block"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-12 top-12 hidden h-2 w-28 rounded-full bg-lindao-gold/50 blur-sm sm:block"
+        />
+        <div className="relative z-[2] max-w-2xl space-y-4 pr-0">
           <div className="flex flex-wrap items-center gap-3">
             <Image
               src="/images/logo.PNG"
