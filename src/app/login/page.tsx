@@ -25,7 +25,7 @@ export default function LoginPage() {
             </p>
           </div>
           <Image
-            src="/images/boneco3.PNG"
+            src="/images/logo.PNG"
             alt=""
             width={260}
             height={330}
