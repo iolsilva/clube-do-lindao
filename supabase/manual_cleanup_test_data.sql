@@ -71,7 +71,7 @@ select
   test_customers.code,
   test_customers.name,
   reward_redemptions.reward_id,
-  reward_redemptions.points_used,
+  reward_redemptions.points_spent,
   reward_redemptions.status,
   reward_redemptions.redemption_date,
   reward_redemptions.notes,
