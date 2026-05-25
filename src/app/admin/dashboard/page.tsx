@@ -212,12 +212,12 @@ export default async function AdminDashboardPage() {
         <div className="relative z-[2] max-w-2xl space-y-4 pr-0">
           <div className="flex flex-wrap items-center gap-3">
             <Image
-              src="/images/logo.PNG"
+              src="/images/logo.png"
               alt="Clube do Lindao"
-              width={72}
-              height={72}
+              width={132}
+              height={94}
               priority
-              className="h-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
+              className="h-16 w-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.28)]"
             />
             <Badge>Programa de Fidelidade Oficial</Badge>
           </div>

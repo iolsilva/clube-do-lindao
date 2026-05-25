@@ -76,13 +76,13 @@ export async function AdminShell({ children }: AdminShellProps) {
         />
         <div className="relative z-[1] mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(220px,0.75fr)_minmax(330px,0.9fr)] lg:items-center lg:px-8">
           <div className="flex min-w-0 items-center gap-4">
-            <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-transparent drop-shadow-[0_16px_34px_rgba(0,0,0,0.28)]">
+            <span className="relative flex h-16 w-32 shrink-0 items-center justify-center overflow-hidden rounded-md bg-transparent drop-shadow-[0_16px_34px_rgba(0,0,0,0.28)]">
               <Image
-                src="/images/logo.PNG"
+                src="/images/logo.png"
                 alt="Clube do Lindao"
                 fill
                 priority
-                sizes="64px"
+                sizes="128px"
                 className="object-contain"
               />
             </span>

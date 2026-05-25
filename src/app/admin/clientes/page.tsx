@@ -272,13 +272,12 @@ export default async function AdminClientesPage({
               </div>
             ) : (
               <div className="divide-y divide-white/10">
-                <div className="hidden grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px_150px] gap-3 bg-white/[0.035] px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 lg:grid">
+                <div className="hidden grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px] gap-3 bg-white/[0.035] px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 lg:grid">
                   <span>Cliente</span>
                   <span>Documento</span>
                   <span>Telefone</span>
                   <span>Nível</span>
                   <span className="text-right">Pontos</span>
-                  <span className="text-right">Ações</span>
                 </div>
 
                 {customers.map((customer) => {
@@ -291,7 +290,7 @@ export default async function AdminClientesPage({
                       key={customer.id}
                       className="px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
                     >
-                      <div className="grid gap-3 lg:grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px_150px] lg:items-center">
+                      <div className="grid gap-3 lg:grid-cols-[minmax(150px,1.25fr)_minmax(112px,0.85fr)_minmax(104px,0.75fr)_minmax(92px,0.7fr)_84px] lg:items-center">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <Badge className="px-2.5 py-0.5">
@@ -352,29 +351,30 @@ export default async function AdminClientesPage({
                           </p>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 lg:justify-end">
-                          <CustomerRedemptionDialog
-                            availablePoints={availablePoints}
-                            customerCode={customer.code}
-                            customerId={customer.id}
-                            customerName={customer.name}
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3 lg:justify-end">
+                        <CustomerRedemptionDialog
+                          availablePoints={availablePoints}
+                          customerCode={customer.code}
+                          customerId={customer.id}
+                          customerName={customer.name}
+                        />
+                        <form action={toggleCustomerStatusAction}>
+                          <input type="hidden" name="id" value={customer.id} />
+                          <input
+                            type="hidden"
+                            name="active"
+                            value={String(customer.active)}
                           />
-                          <form action={toggleCustomerStatusAction}>
-                            <input type="hidden" name="id" value={customer.id} />
-                            <input
-                              type="hidden"
-                              name="active"
-                              value={String(customer.active)}
-                            />
-                            <Button
-                              type="submit"
-                              variant={customer.active ? "secondary" : "primary"}
-                              className="h-8 px-3 text-xs"
-                            >
-                              {customer.active ? "Inativar" : "Ativar"}
-                            </Button>
-                          </form>
-                        </div>
+                          <Button
+                            type="submit"
+                            variant={customer.active ? "secondary" : "primary"}
+                            className="h-8 px-3 text-xs"
+                          >
+                            {customer.active ? "Inativar" : "Ativar"}
+                          </Button>
+                        </form>
                       </div>
 
                       <details className="mt-3">

@@ -25,14 +25,14 @@ export function PublicShell({ children }: PublicShellProps) {
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/ranking"
-              className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-transparent drop-shadow-[0_14px_30px_rgba(0,0,0,0.28)]"
+              className="relative flex h-14 w-28 shrink-0 items-center justify-center overflow-hidden rounded-md bg-transparent drop-shadow-[0_14px_30px_rgba(0,0,0,0.28)]"
             >
               <Image
-                src="/images/logo.PNG"
+                src="/images/logo.png"
                 alt="Clube do Lindao"
                 fill
                 priority
-                sizes="56px"
+                sizes="112px"
                 className="object-contain"
               />
             </Link>
