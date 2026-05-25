@@ -87,12 +87,6 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
         <Alert variant="error" title="Não foi possível carregar o ranking">
           {error}
         </Alert>
-      ) : fullRanking.length === 0 ? (
-        <EmptyState
-          eyebrow="Sem pontuação"
-          title="Nenhum participante no ranking ainda."
-          description="Os clientes aparecem aqui quando acumularem pontos."
-        />
       ) : (
         <>
           {topRanking.length > 0 ? (
@@ -228,9 +222,17 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
               {ranking.length === 0 ? (
                 <div className="p-4">
                   <EmptyState
-                    eyebrow="Sem resultados"
-                    title="Nenhum participante encontrado."
-                    description="Tente buscar por outro nome, telefone ou código."
+                    eyebrow={search ? "Sem resultados" : "Sem pontuação"}
+                    title={
+                      search
+                        ? "Nenhum participante encontrado."
+                        : "Nenhum participante no ranking ainda."
+                    }
+                    description={
+                      search
+                        ? "Tente buscar por outro nome, telefone ou código."
+                        : "Os clientes aparecem aqui quando acumularem pontos."
+                    }
                   />
                 </div>
               ) : (

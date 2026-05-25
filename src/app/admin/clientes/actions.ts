@@ -287,7 +287,7 @@ export async function redeemCustomerPointsAction(
     };
   }
 
-  const { error } = await supabase.from("reward_redemptions").insert({
+  const redemptionPayload = {
     customer_id: values.customerId,
     notes: values.notes || null,
     points_spent: pointsToRedeem,
@@ -296,7 +296,37 @@ export async function redeemCustomerPointsAction(
     redemption_date: redemptionDate,
     reward_id: null,
     status: "completed",
-  });
+  };
+
+  const { error } = await supabase
+    .from("reward_redemptions")
+    .insert(redemptionPayload);
+
+  if (
+    error &&
+    (error.code === "42703" ||
+      error.code === "PGRST204" ||
+      error.message?.includes("points_used") ||
+      error.message?.includes("redemption_date"))
+  ) {
+    const { error: legacyError } = await supabase
+      .from("reward_redemptions")
+      .insert({
+        customer_id: values.customerId,
+        notes: values.notes || null,
+        points_spent: pointsToRedeem,
+        redeemed_at: redemptionDate,
+        reward_id: null,
+        status: "completed",
+      });
+
+    if (!legacyError) {
+      revalidatePath("/admin/clientes");
+      revalidatePath("/admin/dashboard");
+      revalidatePath("/admin/ranking");
+      redirect(getRedirectUrl("redeemed"));
+    }
+  }
 
   if (error) {
     return {
