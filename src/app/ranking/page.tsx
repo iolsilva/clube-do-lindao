@@ -7,22 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatPoints } from "@/lib/formatters";
+import { getPublicRanking } from "@/lib/public-ranking";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
 
 type RankingPageProps = {
   searchParams: Promise<{
     q?: string;
   }>;
-};
-
-type RankingRow = {
-  position: number;
-  customer_id: string;
-  customer_code: string | null;
-  customer_name: string;
-  level_name: string | null;
-  total_points: string | number;
 };
 
 function getPositionLabel(position: number) {
@@ -60,24 +51,7 @@ function getPositionBadgeClass(position: number) {
 export default async function RankingPage({ searchParams }: RankingPageProps) {
   const params = await searchParams;
   const search = params.q?.trim() ?? "";
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("public_ranking_view")
-    .select(
-      "position, customer_id, customer_code, customer_name, level_name, total_points",
-    )
-    .order("position", { ascending: true })
-    .order("customer_name", { ascending: true });
-
-  const searchResult = search
-    ? await supabase.rpc("search_public_ranking", { search_term: search })
-    : null;
-
-  const fullRanking = (data ?? []) as RankingRow[];
-  const ranking = search
-    ? ((searchResult?.data ?? []) as RankingRow[])
-    : fullRanking;
-  const loadError = error ?? searchResult?.error;
+  const { error, fullRanking, ranking } = await getPublicRanking(search);
   const topRanking = fullRanking.filter((row) => row.position <= 3);
 
   return (
@@ -109,9 +83,9 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
         </div>
       </section>
 
-      {loadError ? (
+      {error ? (
         <Alert variant="error" title="Não foi possível carregar o ranking">
-          Tente novamente em alguns instantes.
+          {error}
         </Alert>
       ) : fullRanking.length === 0 ? (
         <EmptyState
@@ -125,7 +99,7 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
             <section className="grid gap-4 md:grid-cols-3">
               {topRanking.map((customer) => (
                 <Card
-                  key={customer.customer_id}
+                  key={`${customer.position}-${customer.customer_code ?? customer.customer_name}`}
                   className={cn(
                     "overflow-hidden border",
                     getTopCardClass(customer.position),
@@ -279,7 +253,7 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
                       <tbody className="divide-y divide-white/10">
                         {ranking.map((customer) => (
                           <tr
-                            key={customer.customer_id}
+                            key={`${customer.position}-${customer.customer_code ?? customer.customer_name}`}
                             className="transition duration-200 hover:bg-white/[0.045]"
                           >
                             <td className="px-4 py-3">
@@ -328,7 +302,7 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
                   <div className="divide-y divide-white/10 md:hidden">
                     {ranking.map((customer) => (
                       <div
-                        key={customer.customer_id}
+                        key={`${customer.position}-${customer.customer_code ?? customer.customer_name}`}
                         className="grid gap-3 px-4 py-3 transition duration-200 hover:bg-white/[0.045]"
                       >
                         <div className="flex items-start justify-between gap-3">

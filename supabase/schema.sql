@@ -339,12 +339,11 @@ order by position, customer_name;
 
 drop function if exists public.search_public_ranking(text);
 
-create function public.search_public_ranking(search_term text default null)
+create function public.search_public_ranking(search_text text default null)
 returns table (
-  position integer,
-  customer_id uuid,
+  rank_position integer,
+  full_name text,
   customer_code text,
-  customer_name text,
   level_name text,
   total_points numeric(12, 2)
 )
@@ -354,8 +353,8 @@ set search_path = public
 as $$
   with normalized as (
     select
-      nullif(trim(coalesce(search_term, '')), '') as raw_term,
-      regexp_replace(coalesce(search_term, ''), '\D', '', 'g') as digit_term
+      nullif(trim(coalesce(search_text, '')), '') as raw_term,
+      regexp_replace(coalesce(search_text, ''), '\D', '', 'g') as digit_term
   ),
   purchase_totals as (
     select
@@ -366,9 +365,8 @@ as $$
   ),
   ranking_source as (
     select
-      customers.id as customer_id,
       customers.code as customer_code,
-      customers.name as customer_name,
+      customers.name as full_name,
       customers.phone,
       levels.name as level_name,
       coalesce(purchase_totals.total_points, 0)::numeric(12, 2) as total_points
@@ -379,26 +377,24 @@ as $$
   ),
   ranked as (
     select
-      dense_rank() over (order by ranking_source.total_points desc) as ranking_position,
-      ranking_source.customer_id,
+      dense_rank() over (order by ranking_source.total_points desc) as rank_position,
       ranking_source.customer_code,
-      ranking_source.customer_name,
+      ranking_source.full_name,
       ranking_source.phone,
       ranking_source.level_name,
       ranking_source.total_points
     from ranking_source
   )
   select
-    ranked.ranking_position::integer as position,
-    ranked.customer_id,
+    ranked.rank_position::integer,
+    ranked.full_name,
     ranked.customer_code,
-    ranked.customer_name,
     ranked.level_name,
     ranked.total_points
   from ranked
   cross join normalized
   where normalized.raw_term is null
-    or ranked.customer_name ilike '%' || normalized.raw_term || '%'
+    or ranked.full_name ilike '%' || normalized.raw_term || '%'
     or coalesce(ranked.customer_code, '') ilike '%' || normalized.raw_term || '%'
     or (
       normalized.digit_term <> ''
@@ -407,7 +403,7 @@ as $$
         or regexp_replace(coalesce(ranked.customer_code, ''), '\D', '', 'g') like '%' || normalized.digit_term || '%'
       )
     )
-  order by ranked.ranking_position, ranked.customer_name;
+  order by ranked.rank_position, ranked.full_name;
 $$;
 
 revoke all on function public.search_public_ranking(text) from public;
