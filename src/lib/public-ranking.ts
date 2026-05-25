@@ -24,6 +24,43 @@ type PublicRankingResult = {
   ranking: PublicRankingRow[];
 };
 
+type SupabaseErrorLike = {
+  code?: string;
+  details?: string;
+  hint?: string;
+  message?: string;
+};
+
+function getReadableSupabaseError(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  const supabaseError = error as SupabaseErrorLike;
+  const parts = [
+    supabaseError.message,
+    supabaseError.code,
+    supabaseError.details,
+    supabaseError.hint,
+  ].filter(Boolean);
+
+  return parts.length > 0 ? parts.join(" | ") : null;
+}
+
+function warnInDevelopment(message: string, error: unknown) {
+  if (process.env.NODE_ENV !== "development") {
+    return;
+  }
+
+  const readableError = getReadableSupabaseError(error);
+
+  if (!readableError) {
+    return;
+  }
+
+  console.warn(message, readableError);
+}
+
 function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase("pt-BR");
 }
@@ -87,7 +124,7 @@ export async function getPublicRanking(
     .order("customer_name", { ascending: true });
 
   if (error) {
-    console.error("Failed to load public ranking", error);
+    warnInDevelopment("Falha ao carregar o ranking público.", error);
 
     return {
       error: "Não foi possível carregar o ranking.",
@@ -118,8 +155,6 @@ export async function getPublicRanking(
       ),
     };
   }
-
-  console.error("Failed to search public ranking", searchResult.error);
 
   return {
     error: null,
