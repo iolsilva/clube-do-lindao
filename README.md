@@ -45,9 +45,10 @@ Variáveis usadas pelo projeto:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-Não use service role no frontend e não versione `.env.local`.
+`SUPABASE_SERVICE_ROLE_KEY` é usada somente no servidor para operações administrativas sensíveis, como o resgate de pontos quando o RLS bloquear o usuário autenticado. Nunca use essa chave com prefixo `NEXT_PUBLIC` e não versione `.env.local`.
 
 Execute o ambiente local:
 
@@ -114,6 +115,7 @@ node .\node_modules\next\dist\bin\next build --webpack
 8. Configure as variáveis de ambiente:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 9. Use o build command padrão:
 
 ```bash

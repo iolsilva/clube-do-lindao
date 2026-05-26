@@ -35,7 +35,8 @@
 - [ ] Adicionar variáveis:
   - [ ] `NEXT_PUBLIC_SUPABASE_URL`
   - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- [ ] Não adicionar service role key na Vercel.
+  - [ ] `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] Confirmar que `SUPABASE_SERVICE_ROLE_KEY` não usa prefixo `NEXT_PUBLIC`.
 - [ ] Fazer deploy.
 
 ## Validação depois do deploy
