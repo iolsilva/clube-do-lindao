@@ -61,6 +61,6 @@ alter table public.reward_redemptions
   alter column points_used set not null,
   alter column redemption_date set default now(),
   alter column redemption_date set not null,
-  alter column status set default 'completed';
+  alter column status set default 'delivered';
 
 commit;

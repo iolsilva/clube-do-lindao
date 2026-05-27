@@ -69,7 +69,7 @@ $$;
 alter table public.reward_redemptions
   alter column redemption_date set default now(),
   alter column redemption_date set not null,
-  alter column status set default 'completed';
+  alter column status set default 'delivered';
 
 drop view if exists public.customer_points_view;
 

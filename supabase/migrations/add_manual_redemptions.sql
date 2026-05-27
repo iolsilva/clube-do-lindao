@@ -73,14 +73,14 @@ alter table public.reward_redemptions
   add column if not exists notes text;
 
 alter table public.reward_redemptions
-  alter column status set default 'completed';
+  alter column status set default 'delivered';
 
 alter table public.reward_redemptions
   drop constraint if exists reward_redemptions_status_check;
 
 alter table public.reward_redemptions
   add constraint reward_redemptions_status_check
-  check (status in ('completed', 'pending', 'approved', 'delivered', 'cancelled'));
+  check (status in ('pending', 'approved', 'delivered', 'cancelled'));
 
 drop view if exists public.customer_points_view;
 

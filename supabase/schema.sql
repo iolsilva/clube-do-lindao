@@ -71,8 +71,8 @@ create table if not exists public.reward_redemptions (
   customer_id uuid not null references public.customers(id) on delete cascade,
   reward_id uuid references public.rewards(id) on delete restrict,
   points_used numeric(12, 2) not null check (points_used >= 0),
-  status text not null default 'completed' check (
-    status in ('completed', 'pending', 'approved', 'delivered', 'cancelled')
+  status text not null default 'delivered' check (
+    status in ('pending', 'approved', 'delivered', 'cancelled')
   ),
   redemption_date timestamptz not null default now(),
   notes text,

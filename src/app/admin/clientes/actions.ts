@@ -55,6 +55,8 @@ type RedemptionPayloadInput = {
   rewardId?: null | string;
 };
 
+const COMPLETED_REDEMPTION_STATUS = "delivered";
+
 function getSearchableErrorText(details: SupabaseErrorDetails) {
   return [
     details.code,
@@ -267,7 +269,7 @@ function getRedemptionPayload({
     points_used: pointsToRedeem,
     redemption_date: redemptionDate,
     reward_id: rewardId,
-    status: "completed",
+    status: COMPLETED_REDEMPTION_STATUS,
   };
 }
 
