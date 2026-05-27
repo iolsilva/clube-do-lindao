@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { PurchaseForm } from "@/components/purchases/purchase-form";
+import { PurchaseRowActions } from "@/components/purchases/purchase-row-actions";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,18 @@ type CustomerSearchRow = {
 type PurchaseRow = {
   id: string;
   amount_cents: number;
+  customer_id: string;
   points: string | number | null;
   purchased_at: string;
   notes: string | null;
   customers: CustomerSearchRow | CustomerSearchRow[] | null;
+};
+
+type PurchaseCustomerOption = {
+  active: boolean;
+  code: string | null;
+  id: string;
+  name: string;
 };
 
 function buildSearchFilter(search: string) {
@@ -77,10 +86,25 @@ function getCustomerFromPurchase(customer: PurchaseRow["customers"]) {
 
 function getStatusMessage(status?: string) {
   const messages: Record<string, string> = {
+    "auth-error": "Usuario nao autenticado.",
     created: "Compra registrada com sucesso.",
+    deleted: "Compra excluida com sucesso.",
+    "delete-error": "Nao foi possivel excluir a compra.",
+    invalid: "Compra invalida.",
+    updated: "Compra atualizada com sucesso.",
   };
 
   return status ? messages[status] : undefined;
+}
+
+function getStatusVariant(status?: string) {
+  if (!status) {
+    return "success";
+  }
+
+  return status.includes("error") || status === "invalid"
+    ? "error"
+    : "success";
 }
 
 function CompactEmptyState({
@@ -159,7 +183,7 @@ export default async function AdminComprasPage({
   let purchasesQuery = supabase
     .from("purchases")
     .select(
-      "id, amount_cents, points, purchased_at, notes, customers(id, code, name, document_type, document, phone, active)",
+      "id, customer_id, amount_cents, points, purchased_at, notes, customers(id, code, name, document_type, document, phone, active)",
     )
     .order("purchased_at", { ascending: false })
     .limit(25);
@@ -168,31 +192,44 @@ export default async function AdminComprasPage({
     purchasesQuery = purchasesQuery.eq("customer_id", selectedCustomerId);
   }
 
+  const purchaseCustomersPromise = supabase
+    .from("customers")
+    .select("id, code, name, active")
+    .order("name", { ascending: true })
+    .limit(500);
+
   const [
     { data: customersData, error: customersError },
     { data: selectedCustomerData, error: selectedCustomerError },
     { data: purchasesData, error: purchasesError },
+    { data: purchaseCustomersData, error: purchaseCustomersError },
   ] = await Promise.all([
     customersPromise,
     selectedCustomerPromise,
     purchasesQuery,
+    purchaseCustomersPromise,
   ]);
 
   const customers = (customersData ?? []) as CustomerSearchRow[];
   const selectedCustomer = selectedCustomerData as CustomerSearchRow | null;
   const purchases = (purchasesData ?? []) as PurchaseRow[];
+  const purchaseCustomers = (purchaseCustomersData ??
+    []) as PurchaseCustomerOption[];
   const statusMessage = getStatusMessage(params.status);
   const loadError =
     customersError?.message ??
     selectedCustomerError?.message ??
-    purchasesError?.message;
+    purchasesError?.message ??
+    purchaseCustomersError?.message;
 
   return (
     <>
       <PageHeader eyebrow="Admin" title="Compras" />
 
       {statusMessage ? (
-        <Alert variant="success">{statusMessage}</Alert>
+        <Alert variant={getStatusVariant(params.status)}>
+          {statusMessage}
+        </Alert>
       ) : null}
 
       {loadError ? (
@@ -392,7 +429,7 @@ export default async function AdminComprasPage({
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+                  <table className="w-full min-w-[920px] border-collapse text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 bg-white/[0.035] text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
                         <th className="px-4 py-3 text-lindao-gold">Data</th>
@@ -400,6 +437,7 @@ export default async function AdminComprasPage({
                         <th className="px-4 py-3">Valor</th>
                         <th className="px-4 py-3 text-lindao-gold">Pontos</th>
                         <th className="px-4 py-3">Observações</th>
+                        <th className="px-4 py-3">Ações</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
@@ -438,6 +476,18 @@ export default async function AdminComprasPage({
                               <p className="truncate text-slate-300">
                                 {purchase.notes || "-"}
                               </p>
+                            </td>
+                            <td className="px-4 py-3">
+                              <PurchaseRowActions
+                                customers={purchaseCustomers}
+                                purchase={{
+                                  amountCents: purchase.amount_cents,
+                                  customerId: purchase.customer_id,
+                                  id: purchase.id,
+                                  notes: purchase.notes,
+                                  purchasedAt: purchase.purchased_at,
+                                }}
+                              />
                             </td>
                           </tr>
                         );
