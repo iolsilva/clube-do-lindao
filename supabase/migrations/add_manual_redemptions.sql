@@ -69,7 +69,7 @@ with purchase_totals as (
 redemption_totals as (
   select
     customer_id,
-    coalesce(sum(coalesce(points_used, points_spent)), 0)::numeric(12, 2) as total_redeemed
+    coalesce(sum(points_used), 0)::numeric(12, 2) as total_redeemed
   from public.reward_redemptions
   where status <> 'cancelled'
   group by customer_id
@@ -135,12 +135,13 @@ from (
 alter table public.reward_redemptions enable row level security;
 
 drop policy if exists "Admins can manage reward redemptions" on public.reward_redemptions;
-create policy "Admins can manage reward redemptions"
+drop policy if exists "Authenticated can manage reward redemptions" on public.reward_redemptions;
+create policy "Authenticated can manage reward redemptions"
 on public.reward_redemptions
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 revoke all on table public.reward_redemptions from anon, authenticated;
 revoke all on table public.customer_points_view from anon, authenticated;

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { onlyDigits } from "@/lib/formatters";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthenticatedUser } from "@/lib/auth/require-authenticated-user";
 
 type DocumentType = "cpf" | "cnpj";
 
@@ -300,38 +300,6 @@ function getRedemptionPayloads({
   ];
 }
 
-async function getAdminAccessError(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-) {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    logSupabaseError("Erro ao validar sessão do usuário.", userError);
-    return "Não foi possível validar sua sessão. Entre novamente e tente cadastrar o cliente.";
-  }
-
-  if (!user) {
-    return "Sua sessão expirou. Entre novamente para cadastrar clientes.";
-  }
-
-
-  const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
-
-  if (adminError) {
-    logSupabaseError("Erro ao validar perfil administrador.", adminError);
-    return "Não foi possível validar a permissão de administrador. Verifique se o schema foi aplicado no Supabase.";
-  }
-
-  if (isAdmin !== true) {
-    return "Seu usuário não tem perfil de administrador configurado no Supabase.";
-  }
-
-  return null;
-}
-
 function parseCustomerForm(formData: FormData): CustomerFormValues {
   const rawDocumentType = getStringValue(formData, "documentType");
   const documentType: DocumentType =
@@ -423,12 +391,11 @@ export async function saveCustomerAction(
     };
   }
 
-  const supabase = await createClient();
-  const adminAccessError = await getAdminAccessError(supabase);
+  const { error: authError, supabase } = await requireAuthenticatedUser();
 
-  if (adminAccessError) {
+  if (authError) {
     return {
-      message: adminAccessError,
+      message: authError,
       values,
     };
   }
@@ -508,7 +475,12 @@ export async function toggleCustomerStatusAction(formData: FormData) {
     redirect(getRedirectUrl("invalid"));
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    redirect(getRedirectUrl("auth-error"));
+  }
+
   const { error } = await supabase
     .from("customers")
     .update({ active: !active })
@@ -559,12 +531,11 @@ export async function redeemCustomerPointsAction(
     };
   }
 
-  const supabase = await createClient();
-  const adminAccessError = await getAdminAccessError(supabase);
+  const { error: authError, supabase } = await requireAuthenticatedUser();
 
-  if (adminAccessError) {
+  if (authError) {
     return {
-      message: adminAccessError,
+      message: authError,
       values,
     };
   }

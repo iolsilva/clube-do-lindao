@@ -31,6 +31,7 @@ type CustomerLevelRow = {
 
 function getStatusMessage(status?: string) {
   const messages: Record<string, string> = {
+    "auth-error": "Usuário não autenticado.",
     created: "Nível criado com sucesso.",
     deleted: "Nível excluído com sucesso.",
     "delete-error": "Não foi possível excluir o nível.",

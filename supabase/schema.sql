@@ -206,24 +206,6 @@ create trigger set_reward_redemptions_updated_at
 before update on public.reward_redemptions
 for each row execute function public.set_updated_at();
 
-create or replace function public.is_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.profiles
-    where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-  );
-$$;
-
-revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated;
-
 drop view if exists public.customer_points_view;
 
 create view public.customer_points_view
@@ -241,7 +223,7 @@ with purchase_totals as (
 redemption_totals as (
   select
     customer_id,
-    coalesce(sum(coalesce(points_used, points_spent)), 0)::numeric(12, 2) as total_redeemed
+    coalesce(sum(points_used), 0)::numeric(12, 2) as total_redeemed
   from public.reward_redemptions
   where status <> 'cancelled'
   group by customer_id
@@ -311,8 +293,16 @@ with (security_barrier = true) as
 with purchase_totals as (
   select
     customer_id,
-    coalesce(sum(points), 0)::numeric(12, 2) as total_points
+    coalesce(sum(points), 0)::numeric(12, 2) as earned_points
   from public.purchases
+  group by customer_id
+),
+redemption_totals as (
+  select
+    customer_id,
+    coalesce(sum(points_used), 0)::numeric(12, 2) as total_redeemed
+  from public.reward_redemptions
+  where status <> 'cancelled'
   group by customer_id
 ),
 ranking_source as (
@@ -321,10 +311,14 @@ ranking_source as (
     customers.code as customer_code,
     customers.name as customer_name,
     levels.name as level_name,
-    coalesce(purchase_totals.total_points, 0)::numeric(12, 2) as total_points
+    greatest(
+      coalesce(purchase_totals.earned_points, 0) - coalesce(redemption_totals.total_redeemed, 0),
+      0
+    )::numeric(12, 2) as total_points
   from public.customers
   left join public.levels on levels.id = customers.level_id
   left join purchase_totals on purchase_totals.customer_id = customers.id
+  left join redemption_totals on redemption_totals.customer_id = customers.id
   where customers.active = true
 )
 select
@@ -359,8 +353,16 @@ as $$
   purchase_totals as (
     select
       customer_id,
-      coalesce(sum(points), 0)::numeric(12, 2) as total_points
+      coalesce(sum(points), 0)::numeric(12, 2) as earned_points
     from public.purchases
+    group by customer_id
+  ),
+  redemption_totals as (
+    select
+      customer_id,
+      coalesce(sum(points_used), 0)::numeric(12, 2) as total_redeemed
+    from public.reward_redemptions
+    where status <> 'cancelled'
     group by customer_id
   ),
   ranking_source as (
@@ -369,10 +371,14 @@ as $$
       customers.name as full_name,
       customers.phone,
       levels.name as level_name,
-      coalesce(purchase_totals.total_points, 0)::numeric(12, 2) as total_points
+      greatest(
+        coalesce(purchase_totals.earned_points, 0) - coalesce(redemption_totals.total_redeemed, 0),
+        0
+      )::numeric(12, 2) as total_points
     from public.customers
     left join public.levels on levels.id = customers.level_id
     left join purchase_totals on purchase_totals.customer_id = customers.id
+    left join redemption_totals on redemption_totals.customer_id = customers.id
     where customers.active = true
   ),
   ranked as (
@@ -416,36 +422,40 @@ alter table public.rewards enable row level security;
 alter table public.reward_redemptions enable row level security;
 
 drop policy if exists "Admins can manage profiles" on public.profiles;
-create policy "Admins can manage profiles"
+drop policy if exists "Authenticated can manage profiles" on public.profiles;
+create policy "Authenticated can manage profiles"
 on public.profiles
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 drop policy if exists "Admins can manage levels" on public.levels;
-create policy "Admins can manage levels"
+drop policy if exists "Authenticated can manage levels" on public.levels;
+create policy "Authenticated can manage levels"
 on public.levels
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 drop policy if exists "Admins can manage customers" on public.customers;
-create policy "Admins can manage customers"
+drop policy if exists "Authenticated can manage customers" on public.customers;
+create policy "Authenticated can manage customers"
 on public.customers
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 drop policy if exists "Admins can manage purchases" on public.purchases;
-create policy "Admins can manage purchases"
+drop policy if exists "Authenticated can manage purchases" on public.purchases;
+create policy "Authenticated can manage purchases"
 on public.purchases
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 drop policy if exists "Public can read active rewards" on public.rewards;
 create policy "Public can read active rewards"
@@ -455,20 +465,22 @@ to anon, authenticated
 using (active = true);
 
 drop policy if exists "Admins can manage rewards" on public.rewards;
-create policy "Admins can manage rewards"
+drop policy if exists "Authenticated can manage rewards" on public.rewards;
+create policy "Authenticated can manage rewards"
 on public.rewards
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 drop policy if exists "Admins can manage reward redemptions" on public.reward_redemptions;
-create policy "Admins can manage reward redemptions"
+drop policy if exists "Authenticated can manage reward redemptions" on public.reward_redemptions;
+create policy "Authenticated can manage reward redemptions"
 on public.reward_redemptions
 for all
 to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (auth.uid() is not null)
+with check (auth.uid() is not null);
 
 revoke all on table public.profiles from anon, authenticated;
 revoke all on table public.levels from anon, authenticated;

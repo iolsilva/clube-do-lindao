@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { slugify } from "@/lib/formatters";
-import { createClient } from "@/lib/supabase/server";
+import {
+  requireAuthenticatedUser,
+  type AppSupabaseClient,
+} from "@/lib/auth/require-authenticated-user";
 
 type LevelFormValues = {
   id?: string;
@@ -41,8 +44,11 @@ function parseSortOrder(value: string) {
   return Number.isInteger(number) ? number : null;
 }
 
-async function getUniqueSlug(name: string, currentId?: string) {
-  const supabase = await createClient();
+async function getUniqueSlug(
+  supabase: AppSupabaseClient,
+  name: string,
+  currentId?: string,
+) {
   const baseSlug = slugify(name) || "nivel";
   const { data } = await supabase
     .from("levels")
@@ -105,8 +111,16 @@ export async function saveLevelAction(
     };
   }
 
-  const supabase = await createClient();
-  const slug = await getUniqueSlug(values.name, values.id);
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    return {
+      message: authError,
+      values,
+    };
+  }
+
+  const slug = await getUniqueSlug(supabase, values.name, values.id);
   const payload = {
     active: true,
     benefit_description: values.description || null,
@@ -139,7 +153,12 @@ export async function deleteLevelAction(formData: FormData) {
     redirect(getRedirectUrl("invalid"));
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    redirect(getRedirectUrl("auth-error"));
+  }
+
   const { count, error: countError } = await supabase
     .from("customers")
     .select("id", { count: "exact", head: true })

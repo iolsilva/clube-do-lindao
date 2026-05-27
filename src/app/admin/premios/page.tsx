@@ -29,6 +29,7 @@ type RewardRow = {
 
 function getStatusMessage(status?: string) {
   const messages: Record<string, string> = {
+    "auth-error": "Usuário não autenticado.",
     activated: "Prêmio ativado com sucesso.",
     created: "Prêmio criado com sucesso.",
     deactivated: "Prêmio inativado com sucesso.",

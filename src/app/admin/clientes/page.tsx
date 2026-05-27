@@ -79,6 +79,7 @@ function getLevelName(levels: CustomerRow["levels"]) {
 function getStatusMessage(status?: string) {
   const messages: Record<string, string> = {
     activated: "Cliente ativado com sucesso.",
+    "auth-error": "Usuário não autenticado.",
     created: "Cliente cadastrado com sucesso.",
     deactivated: "Cliente inativado com sucesso.",
     invalid: "Cliente inválido.",

@@ -6,7 +6,7 @@ import {
   calculatePointsFromCents,
   parseCurrencyToCents,
 } from "@/lib/formatters";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthenticatedUser } from "@/lib/auth/require-authenticated-user";
 
 type PurchaseFormValues = {
   customerId: string;
@@ -86,7 +86,14 @@ export async function createPurchaseAction(
     };
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    return {
+      message: authError,
+      values,
+    };
+  }
 
   const { data: customer, error: customerError } = await supabase
     .from("customers")

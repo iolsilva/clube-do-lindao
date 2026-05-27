@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthenticatedUser } from "@/lib/auth/require-authenticated-user";
 
 type RewardFormValues = {
   id?: string;
@@ -93,7 +93,15 @@ export async function saveRewardAction(
     };
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    return {
+      message: authError,
+      values,
+    };
+  }
+
   const payload = {
     active: values.active,
     description: values.description || null,
@@ -124,7 +132,12 @@ export async function toggleRewardStatusAction(formData: FormData) {
     redirect(getRedirectUrl("invalid"));
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase } = await requireAuthenticatedUser();
+
+  if (authError) {
+    redirect(getRedirectUrl("auth-error"));
+  }
+
   const { error } = await supabase
     .from("rewards")
     .update({ active: !active })
