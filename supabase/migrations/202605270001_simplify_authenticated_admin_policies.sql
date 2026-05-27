@@ -16,6 +16,7 @@ begin
       and column_name = 'points_spent'
   ) then
     execute 'update public.reward_redemptions set points_used = points_spent where points_used is null';
+    execute 'alter table public.reward_redemptions alter column points_spent drop not null';
   end if;
 end;
 $$;
@@ -56,6 +57,7 @@ begin
       and column_name = 'redeemed_at'
   ) then
     execute 'update public.reward_redemptions set redemption_date = coalesce(redemption_date, redeemed_at, created_at, now()) where redemption_date is null';
+    execute 'alter table public.reward_redemptions alter column redeemed_at drop not null';
   else
     update public.reward_redemptions
     set redemption_date = coalesce(redemption_date, created_at, now())

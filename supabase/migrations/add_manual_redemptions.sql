@@ -6,8 +6,23 @@ alter table public.reward_redemptions
 alter table public.reward_redemptions
   add column if not exists points_used numeric(12, 2);
 
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'reward_redemptions'
+      and column_name = 'points_spent'
+  ) then
+    execute 'update public.reward_redemptions set points_used = points_spent where points_used is null';
+    execute 'alter table public.reward_redemptions alter column points_spent drop not null';
+  end if;
+end;
+$$;
+
 update public.reward_redemptions
-set points_used = points_spent
+set points_used = 0
 where points_used is null;
 
 alter table public.reward_redemptions
@@ -31,8 +46,23 @@ $$;
 alter table public.reward_redemptions
   add column if not exists redemption_date timestamptz;
 
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'reward_redemptions'
+      and column_name = 'redeemed_at'
+  ) then
+    execute 'update public.reward_redemptions set redemption_date = redeemed_at where redemption_date is null';
+    execute 'alter table public.reward_redemptions alter column redeemed_at drop not null';
+  end if;
+end;
+$$;
+
 update public.reward_redemptions
-set redemption_date = redeemed_at
+set redemption_date = coalesce(redemption_date, created_at, now())
 where redemption_date is null;
 
 alter table public.reward_redemptions

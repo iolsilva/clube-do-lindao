@@ -55,6 +55,44 @@ type RedemptionPayloadInput = {
   rewardId?: null | string;
 };
 
+function getSearchableErrorText(details: SupabaseErrorDetails) {
+  return [
+    details.code,
+    details.details,
+    details.hint,
+    details.message,
+    details.name,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function extractMissingSchemaTarget(details: SupabaseErrorDetails) {
+  const rawError = [
+    details.details,
+    details.hint,
+    details.message,
+    details.name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const columnMatch =
+    rawError.match(/column ['"]?([^'"\s]+)['"]? (?:of|does not exist)/i) ??
+    rawError.match(/could not find the ['"]([^'"]+)['"] column/i) ??
+    rawError.match(/column ['"]([^'"]+)['"]/i);
+  const relationMatch =
+    rawError.match(/relation ['"]?([^'"\s]+)['"]? does not exist/i) ??
+    rawError.match(/could not find the (?:table|view) ['"]([^'"]+)['"]/i) ??
+    rawError.match(/table ['"]([^'"]+)['"]/i);
+
+  return {
+    missingColumn: columnMatch?.[1],
+    missingRelation: relationMatch?.[1],
+  };
+}
+
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -90,6 +128,7 @@ function logSupabaseError(context: string, error: unknown) {
     details: details.details,
     hint: details.hint,
     message: details.message,
+    ...extractMissingSchemaTarget(details),
     name: details.name,
     status: details.status,
   });
@@ -102,15 +141,7 @@ function getReadableCustomerSaveError(error: unknown) {
     return "Não foi possível salvar o cliente.";
   }
 
-  const searchableError = [
-    details.code,
-    details.details,
-    details.hint,
-    details.message,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  const searchableError = getSearchableErrorText(details);
 
   if (details.code === "23505" || searchableError.includes("duplicate")) {
     return "Já existe um cliente com este documento.";
@@ -121,7 +152,7 @@ function getReadableCustomerSaveError(error: unknown) {
     searchableError.includes("row-level security") ||
     searchableError.includes("permission denied")
   ) {
-    return "Seu usuário está autenticado, mas não tem permissão de administrador para salvar clientes.";
+    return "Usuário autenticado sem permissão para salvar clientes. Verifique as policies RLS no Supabase.";
   }
 
   if (
@@ -160,33 +191,6 @@ function getReadableCustomerSaveError(error: unknown) {
     : "Não foi possível salvar o cliente.";
 }
 
-function isRedemptionSchemaFallbackError(error: unknown) {
-  const details = getSupabaseErrorDetails(error);
-
-  if (!details) {
-    return false;
-  }
-
-  const searchableError = [
-    details.code,
-    details.details,
-    details.hint,
-    details.message,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return (
-    details.code === "42703" ||
-    details.code === "PGRST204" ||
-    searchableError.includes("points_used") ||
-    searchableError.includes("points_spent") ||
-    searchableError.includes("redemption_date") ||
-    searchableError.includes("redeemed_at")
-  );
-}
-
 function getReadableRedemptionSaveError(error: unknown) {
   const details = getSupabaseErrorDetails(error);
 
@@ -194,22 +198,15 @@ function getReadableRedemptionSaveError(error: unknown) {
     return "Não foi possível salvar o resgate.";
   }
 
-  const searchableError = [
-    details.code,
-    details.details,
-    details.hint,
-    details.message,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  const searchableError = getSearchableErrorText(details);
+  const { missingColumn, missingRelation } = extractMissingSchemaTarget(details);
 
   if (
     details.code === "42501" ||
     searchableError.includes("row-level security") ||
     searchableError.includes("permission denied")
   ) {
-    return "Seu usuário está autenticado, mas não tem permissão de administrador para salvar resgates.";
+    return "Usuário autenticado sem permissão para salvar resgates. Verifique as policies RLS no Supabase.";
   }
 
   if (details.code === "23502" && searchableError.includes("reward_id")) {
@@ -226,10 +223,14 @@ function getReadableRedemptionSaveError(error: unknown) {
 
   if (
     details.code === "42P01" ||
-    searchableError.includes("relation") ||
-    searchableError.includes("does not exist")
+    searchableError.includes("does not exist") ||
+    searchableError.includes("could not find the table") ||
+    searchableError.includes("could not find the view") ||
+    searchableError.includes("could not find the relation")
   ) {
-    return "A tabela ou view de resgates não está completa. Aplique a migration de resgates no Supabase.";
+    return missingRelation
+      ? `A estrutura de resgates está desatualizada. Verifique no Supabase se ${missingRelation} existe.`
+      : "A estrutura de resgates está desatualizada. Verifique se as tabelas e views foram criadas no Supabase.";
   }
 
   if (
@@ -237,7 +238,9 @@ function getReadableRedemptionSaveError(error: unknown) {
     details.code === "PGRST204" ||
     searchableError.includes("column")
   ) {
-    return "O banco de dados está sem uma coluna esperada para resgates. Aplique a migration de resgates no Supabase.";
+    return missingColumn
+      ? `A estrutura de resgates está desatualizada. Verifique no Supabase a coluna ${missingColumn}.`
+      : "A estrutura de resgates está desatualizada. Verifique as colunas da tabela reward_redemptions no Supabase.";
   }
 
   if (details.code === "23503" && searchableError.includes("customer_id")) {
@@ -249,55 +252,23 @@ function getReadableRedemptionSaveError(error: unknown) {
     : "Não foi possível salvar o resgate.";
 }
 
-function getRedemptionPayloads({
+function getRedemptionPayload({
   customerId,
   notes,
   pointsToRedeem,
   redemptionDate,
   rewardId = null,
-}: RedemptionPayloadInput): Array<{
-  label: string;
-  payload: RedemptionInsertPayload;
-}> {
+}: RedemptionPayloadInput): RedemptionInsertPayload {
   const cleanedNotes = notes || null;
 
-  return [
-    {
-      label: "schema completo de resgates manuais",
-      payload: {
-        customer_id: customerId,
-        notes: cleanedNotes,
-        points_spent: pointsToRedeem,
-        points_used: pointsToRedeem,
-        redeemed_at: redemptionDate,
-        redemption_date: redemptionDate,
-        reward_id: rewardId,
-        status: "completed",
-      },
-    },
-    {
-      label: "schema atual de resgates manuais",
-      payload: {
-        customer_id: customerId,
-        notes: cleanedNotes,
-        points_used: pointsToRedeem,
-        redemption_date: redemptionDate,
-        reward_id: rewardId,
-        status: "completed",
-      },
-    },
-    {
-      label: "schema legado de resgates",
-      payload: {
-        customer_id: customerId,
-        notes: cleanedNotes,
-        points_spent: pointsToRedeem,
-        redeemed_at: redemptionDate,
-        reward_id: rewardId,
-        status: "completed",
-      },
-    },
-  ];
+  return {
+    customer_id: customerId,
+    notes: cleanedNotes,
+    points_used: pointsToRedeem,
+    redemption_date: redemptionDate,
+    reward_id: rewardId,
+    status: "completed",
+  };
 }
 
 function parseCustomerForm(formData: FormData): CustomerFormValues {
@@ -596,40 +567,7 @@ export async function redeemCustomerPointsAction(
   };
   const { error } = await supabase
     .from("reward_redemptions")
-    .insert(getRedemptionPayloads(redemptionInput)[0].payload);
-
-  if (error && isRedemptionSchemaFallbackError(error)) {
-    logSupabaseError(
-      "Erro ao salvar resgate no schema completo; tentando fallbacks.",
-      error,
-    );
-
-    let fallbackError: unknown = error;
-
-    for (const fallback of getRedemptionPayloads(redemptionInput).slice(1)) {
-      const { error: currentFallbackError } = await supabase
-        .from("reward_redemptions")
-        .insert(fallback.payload);
-
-      if (!currentFallbackError) {
-        revalidatePath("/admin/clientes");
-        revalidatePath("/admin/dashboard");
-        revalidatePath("/admin/ranking");
-        redirect(getRedirectUrl("redeemed"));
-      }
-
-      fallbackError = currentFallbackError;
-      logSupabaseError(
-        `Erro ao salvar resgate no ${fallback.label}.`,
-        currentFallbackError,
-      );
-    }
-
-    return {
-      message: getReadableRedemptionSaveError(fallbackError),
-      values,
-    };
-  }
+    .insert(getRedemptionPayload(redemptionInput));
 
   if (error) {
     logSupabaseError("Erro ao salvar resgate.", error);
