@@ -48,13 +48,6 @@ type PurchaseRow = {
   customers: CustomerSearchRow | CustomerSearchRow[] | null;
 };
 
-type PurchaseCustomerOption = {
-  active: boolean;
-  code: string | null;
-  id: string;
-  name: string;
-};
-
 function buildSearchFilter(search: string) {
   const textSearch = search
     .replace(/[%,()]/g, " ")
@@ -192,35 +185,24 @@ export default async function AdminComprasPage({
     purchasesQuery = purchasesQuery.eq("customer_id", selectedCustomerId);
   }
 
-  const purchaseCustomersPromise = supabase
-    .from("customers")
-    .select("id, code, name, active")
-    .order("name", { ascending: true })
-    .limit(500);
-
   const [
     { data: customersData, error: customersError },
     { data: selectedCustomerData, error: selectedCustomerError },
     { data: purchasesData, error: purchasesError },
-    { data: purchaseCustomersData, error: purchaseCustomersError },
   ] = await Promise.all([
     customersPromise,
     selectedCustomerPromise,
     purchasesQuery,
-    purchaseCustomersPromise,
   ]);
 
   const customers = (customersData ?? []) as CustomerSearchRow[];
   const selectedCustomer = selectedCustomerData as CustomerSearchRow | null;
   const purchases = (purchasesData ?? []) as PurchaseRow[];
-  const purchaseCustomers = (purchaseCustomersData ??
-    []) as PurchaseCustomerOption[];
   const statusMessage = getStatusMessage(params.status);
   const loadError =
     customersError?.message ??
     selectedCustomerError?.message ??
-    purchasesError?.message ??
-    purchaseCustomersError?.message;
+    purchasesError?.message;
 
   return (
     <>
@@ -479,10 +461,12 @@ export default async function AdminComprasPage({
                             </td>
                             <td className="px-4 py-3">
                               <PurchaseRowActions
-                                customers={purchaseCustomers}
                                 purchase={{
                                   amountCents: purchase.amount_cents,
+                                  customerCode: customer?.code ?? null,
                                   customerId: purchase.customer_id,
+                                  customerName:
+                                    customer?.name ?? "Cliente removido",
                                   id: purchase.id,
                                   notes: purchase.notes,
                                   purchasedAt: purchase.purchased_at,
