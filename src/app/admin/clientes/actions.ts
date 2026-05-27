@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { onlyDigits } from "@/lib/formatters";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-
-const PRIMARY_ADMIN_EMAIL = "admin@saomarcos.com.br";
-const MANUAL_REDEMPTION_REWARD_NAME = "Resgate manual";
 
 type DocumentType = "cpf" | "cnpj";
 
@@ -59,12 +55,6 @@ type RedemptionPayloadInput = {
   rewardId?: null | string;
 };
 
-type CustomerPointsRow = {
-  available_points?: null | number | string;
-  customer_id: string;
-  total_points?: null | number | string;
-};
-
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -103,10 +93,6 @@ function logSupabaseError(context: string, error: unknown) {
     name: details.name,
     status: details.status,
   });
-}
-
-function isPrimaryAdminEmail(email?: null | string) {
-  return email?.toLocaleLowerCase("pt-BR") === PRIMARY_ADMIN_EMAIL;
 }
 
 function getReadableCustomerSaveError(error: unknown) {
@@ -199,26 +185,6 @@ function isRedemptionSchemaFallbackError(error: unknown) {
     searchableError.includes("redemption_date") ||
     searchableError.includes("redeemed_at")
   );
-}
-
-function isRewardIdRequiredError(error: unknown) {
-  const details = getSupabaseErrorDetails(error);
-
-  if (!details) {
-    return false;
-  }
-
-  const searchableError = [
-    details.code,
-    details.details,
-    details.hint,
-    details.message,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return details.code === "23502" && searchableError.includes("reward_id");
 }
 
 function getReadableRedemptionSaveError(error: unknown) {
@@ -334,157 +300,6 @@ function getRedemptionPayloads({
   ];
 }
 
-async function getManualRedemptionRewardId(
-  supabaseAdmin: ReturnType<typeof createAdminClient>,
-) {
-  const { data: existingReward, error: existingRewardError } =
-    await supabaseAdmin
-      .from("rewards")
-      .select("id")
-      .eq("name", MANUAL_REDEMPTION_REWARD_NAME)
-      .limit(1)
-      .maybeSingle();
-
-  if (existingRewardError) {
-    logSupabaseError(
-      "Erro ao buscar prêmio interno de resgate manual.",
-      existingRewardError,
-    );
-  }
-
-  if (existingReward && "id" in existingReward) {
-    return String(existingReward.id);
-  }
-
-  const { data: createdReward, error: createRewardError } = await supabaseAdmin
-    .from("rewards")
-    .insert({
-      active: false,
-      description: "Registro interno usado para resgates manuais de pontos.",
-      name: MANUAL_REDEMPTION_REWARD_NAME,
-      points_required: 0,
-    })
-    .select("id")
-    .single();
-
-  if (createRewardError) {
-    logSupabaseError(
-      "Erro ao criar prêmio interno de resgate manual.",
-      createRewardError,
-    );
-    return null;
-  }
-
-  return createdReward && "id" in createdReward
-    ? String(createdReward.id)
-    : null;
-}
-
-async function saveRedemptionWithServiceRole(input: RedemptionPayloadInput) {
-  let supabaseAdmin: ReturnType<typeof createAdminClient>;
-
-  try {
-    supabaseAdmin = createAdminClient();
-  } catch (error) {
-    logSupabaseError("Service role não configurada para resgate.", error);
-
-    return {
-      error,
-      message:
-        "A chave SUPABASE_SERVICE_ROLE_KEY não está configurada no servidor da Vercel.",
-      success: false,
-    };
-  }
-
-  let lastError: unknown = null;
-
-  for (const fallback of getRedemptionPayloads(input)) {
-    const { error } = await supabaseAdmin
-      .from("reward_redemptions")
-      .insert(fallback.payload);
-
-    if (!error) {
-      return { success: true };
-    }
-
-    lastError = error;
-    logSupabaseError(
-      `Erro ao salvar resgate com service role no ${fallback.label}.`,
-      error,
-    );
-  }
-
-  if (isRewardIdRequiredError(lastError)) {
-    const manualRewardId = await getManualRedemptionRewardId(supabaseAdmin);
-
-    if (manualRewardId) {
-      for (const fallback of getRedemptionPayloads({
-        ...input,
-        rewardId: manualRewardId,
-      })) {
-        const { error } = await supabaseAdmin
-          .from("reward_redemptions")
-          .insert(fallback.payload);
-
-        if (!error) {
-          return { success: true };
-        }
-
-        lastError = error;
-        logSupabaseError(
-          `Erro ao salvar resgate com prêmio interno no ${fallback.label}.`,
-          error,
-        );
-      }
-    }
-  }
-
-  return {
-    error: lastError,
-    message: getReadableRedemptionSaveError(lastError),
-    success: false,
-  };
-}
-
-async function getCustomerPointsWithServiceRole(customerId: string) {
-  let supabaseAdmin: ReturnType<typeof createAdminClient>;
-
-  try {
-    supabaseAdmin = createAdminClient();
-  } catch (error) {
-    logSupabaseError("Service role não configurada para validar saldo.", error);
-
-    return {
-      data: null,
-      error,
-      message:
-        "A chave SUPABASE_SERVICE_ROLE_KEY não está configurada no servidor da Vercel.",
-    };
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from("customer_points_view")
-    .select("customer_id, available_points, total_points")
-    .eq("customer_id", customerId)
-    .maybeSingle();
-
-  if (error) {
-    logSupabaseError("Erro ao validar saldo com service role.", error);
-
-    return {
-      data: null,
-      error,
-      message: getReadableRedemptionSaveError(error),
-    };
-  }
-
-  return {
-    data: data as CustomerPointsRow | null,
-    error: null,
-    message: null,
-  };
-}
-
 async function getAdminAccessError(
   supabase: Awaited<ReturnType<typeof createClient>>,
 ) {
@@ -502,9 +317,6 @@ async function getAdminAccessError(
     return "Sua sessão expirou. Entre novamente para cadastrar clientes.";
   }
 
-  if (isPrimaryAdminEmail(user.email)) {
-    return null;
-  }
 
   const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
 
@@ -762,27 +574,17 @@ export async function redeemCustomerPointsAction(
     .select("customer_id, available_points, total_points")
     .eq("customer_id", values.customerId)
     .maybeSingle();
-  let resolvedCustomerPoints = customerPoints as CustomerPointsRow | null;
 
   if (pointsError) {
     logSupabaseError("Erro ao validar saldo para resgate.", pointsError);
-    const servicePointsResult = await getCustomerPointsWithServiceRole(
-      values.customerId,
-    );
 
-    if (servicePointsResult.error || !servicePointsResult.data) {
-      return {
-        message:
-          servicePointsResult.message ??
-          getReadableRedemptionSaveError(pointsError),
-        values,
-      };
-    }
-
-    resolvedCustomerPoints = servicePointsResult.data;
+    return {
+      message: getReadableRedemptionSaveError(pointsError),
+      values,
+    };
   }
 
-  if (!resolvedCustomerPoints) {
+  if (!customerPoints) {
     return {
       message:
         "Não foi possível encontrar o saldo do cliente. Atualize a página e tente novamente.",
@@ -792,8 +594,8 @@ export async function redeemCustomerPointsAction(
 
   const availablePoints = Math.max(
     Number(
-      resolvedCustomerPoints.available_points ??
-        resolvedCustomerPoints.total_points ??
+      customerPoints.available_points ??
+        customerPoints.total_points ??
         0,
     ),
     0,
@@ -852,18 +654,8 @@ export async function redeemCustomerPointsAction(
       );
     }
 
-    const serviceResult = await saveRedemptionWithServiceRole(redemptionInput);
-
-    if (serviceResult.success) {
-      revalidatePath("/admin/clientes");
-      revalidatePath("/admin/dashboard");
-      revalidatePath("/admin/ranking");
-      redirect(getRedirectUrl("redeemed"));
-    }
-
     return {
-      message:
-        serviceResult.message ?? getReadableRedemptionSaveError(fallbackError),
+      message: getReadableRedemptionSaveError(fallbackError),
       values,
     };
   }
@@ -871,17 +663,8 @@ export async function redeemCustomerPointsAction(
   if (error) {
     logSupabaseError("Erro ao salvar resgate.", error);
 
-    const serviceResult = await saveRedemptionWithServiceRole(redemptionInput);
-
-    if (serviceResult.success) {
-      revalidatePath("/admin/clientes");
-      revalidatePath("/admin/dashboard");
-      revalidatePath("/admin/ranking");
-      redirect(getRedirectUrl("redeemed"));
-    }
-
     return {
-      message: serviceResult.message ?? getReadableRedemptionSaveError(error),
+      message: getReadableRedemptionSaveError(error),
       values,
     };
   }

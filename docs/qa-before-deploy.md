@@ -30,7 +30,7 @@ Fluxos revisados:
 - Resgate de pontos por revisão de código e compatibilidade com o banco atual.
 - Cálculo de pontos em compras: `points_generated = total_amount * 0.1`.
 - Dashboard com totais, valor movimentado, top ranking e últimas compras.
-- Segurança de variáveis de ambiente e ausência de service role no frontend.
+- Segurança de variáveis de ambiente e ausência de chaves secretas no frontend.
 
 ## Checklist de QA
 
@@ -45,7 +45,7 @@ Fluxos revisados:
 - [x] Build de produção compila com sucesso.
 - [x] ESLint passa pelo executável direto.
 - [x] `.env.local` não está versionado.
-- [x] Nenhuma service role foi encontrada exposta no código.
+- [x] Nenhuma chave secreta foi encontrada exposta no código.
 
 ## Bugs encontrados
 
@@ -74,7 +74,7 @@ Fluxos revisados:
 
 - `git status --short`
 - `git ls-files .env.local`
-- Busca de service role/segredos no código.
+- Busca de chaves secretas no código.
 - Fetch sem sessão para `/admin/dashboard`: retornou `307` para `/login?redirectedFrom=%2Fadmin%2Fdashboard`.
 - Fetch para `/api/public-ranking?q=Iago`: retornou `200` com somente `data` e `error`.
 - Navegação no browser para rotas públicas e admin, verificando overlay, console e renderização.

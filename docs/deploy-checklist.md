@@ -9,7 +9,7 @@
   - [ ] `node .\node_modules\next\dist\bin\next build --webpack`
 - [ ] Confirmar que `.env.local` não está versionado.
 - [ ] Confirmar que `.env.example` existe.
-- [ ] Confirmar que nenhuma service role está exposta no código.
+- [ ] Confirmar que nenhuma chave secreta está exposta no código.
 - [ ] Confirmar que não há dados sensíveis em páginas públicas.
 - [ ] Confirmar que `README.md` tem instruções de deploy.
 - [ ] Fazer commit final.
@@ -35,8 +35,6 @@
 - [ ] Adicionar variáveis:
   - [ ] `NEXT_PUBLIC_SUPABASE_URL`
   - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Confirmar que `SUPABASE_SERVICE_ROLE_KEY` não usa prefixo `NEXT_PUBLIC`.
 - [ ] Fazer deploy.
 
 ## Validação depois do deploy
